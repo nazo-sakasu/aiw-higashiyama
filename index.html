@@ -225,6 +225,8 @@
   }
   .q-head .kana{ font-size:.84rem; font-weight:700; color:var(--muted); }
   .q{ margin:0; font-size:1.12rem; font-weight:900; line-height:1.6; }
+  .locked{ margin:0; padding:12px 14px; border-radius:8px; border:2px dashed var(--ink); background:var(--paper); font-size:.86rem; font-weight:700; color:var(--muted); text-align:center; }
+  .locked b{ display:block; color:var(--ink); font-size:.96rem; font-weight:900; margin-bottom:2px; }
   .q-sub{ margin:6px 0 0; color:var(--red); font-size:.86rem; font-weight:800; line-height:1.5; }
   dd .nw{ display:inline-block; }
   .ans{ display:flex; gap:8px; }
@@ -416,7 +418,7 @@
     background:linear-gradient(#332D27 0 50%, #29241F 50%); box-shadow:0 2px 0 rgba(0,0,0,.22);
   }
   .tiles i::after{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(0,0,0,.65); }
-  .tiles i.f{ animation:tflip .07s linear; }
+  .tiles i.f{ animation:tflip .1s linear; }
   @keyframes tflip{ from{ transform:rotateX(-80deg); } to{ transform:none; } }
   .fbody{ display:flex; flex-direction:column; gap:8px; }
   .fbody p{ margin:0; font-size:.95rem; font-weight:700; line-height:1.75; }
@@ -432,9 +434,17 @@
   .tiles.digits i[data-ch="."]::after{ display:none; }
   .fs-val .unit{ font-weight:900; font-size:1.35rem; color:var(--yellow); line-height:1.6; }
   .fs-val .tail{ font-weight:900; font-size:1.05rem; line-height:1.9; }
+  .fs-val .vgrp{ display:inline-flex; align-items:flex-end; gap:8px; white-space:nowrap; }
+  .fs-val .tail.long{ flex-basis:100%; text-align:center; font-size:.98rem; line-height:1.6; margin-top:2px; }
+  .tiles.digits.sm i{ font-size:1.75rem; }
+  .tiles .nb{ display:flex; gap:3px; }
+  .tiles.digits .nb{ gap:4px; }
+  .fs-after{ margin:8px 0 0; font-size:.86rem; font-weight:700; line-height:1.6; }
+  .tiles.digits i[data-ch="〜"]{ width:.7em; background:none; box-shadow:none; font-size:1.6rem; }
+  .tiles.digits i[data-ch="〜"]::after{ display:none; }
   .fs-note{ margin:6px 0 0; font-size:.78rem; font-weight:700; line-height:1.55; color:#C9C2B6; }
   .fact > .fs-note{ color:var(--muted); }
-  .fl.reveal-line{ animation:lineIn .5s cubic-bezier(.2,1.1,.4,1) both; transform-origin:50% 0; }
+  .fl.reveal-line{ animation:lineIn .8s cubic-bezier(.2,1.1,.4,1) both; transform-origin:50% 0; }
   @keyframes lineIn{ from{ opacity:0; transform:perspective(700px) rotateX(-75deg); } to{ opacity:1; transform:none; } }
   .fact-foot{ display:flex; justify-content:flex-end; }
   .replay{
@@ -682,7 +692,10 @@
     closed:["2026-11-02","2026-11-09","2026-11-16","2026-11-24","2026-11-30"],
     holidays:["2026-11-03","2026-11-23"]
   };
-  var CERT_NICK_MAX = 12;   // 完走証のニックネーム最大文字数
+  var CERT_NICK_MAX = 12;
+  // 開始前ロック：true にすると OPEN_AT（日本時間）まで答えを入力できない。URL末尾に ?unlock=1 を付けるとロック中でもテストできる
+  var LOCK_BEFORE_OPEN = false;   // ★ 最後に true にする
+  var OPEN_AT = "2026-11-01T09:00:00+09:00";   // 完走証のニックネーム最大文字数
 
   var ABOUT = [
     { label:"開催期間", value:["2026年11月1日（日）〜","11月30日（月）"], note:"※お出かけ前に、東山動植物園の休園日をご確認ください。" },
@@ -692,9 +705,9 @@
   ];
 
   var HOW_TO = [
-    "園内に設置された問題を探そう！",
-    "THROW・JUMP・RUN・RELAYの4種目は、どこから回ってもOK！",
-    "問題が解けたら、記録カードで同じ種目を選んで答えを入力！",
+    "手元の謎解きキットを片手に、園内をめぐろう！",
+    "THROW・JUMP・RUN・RELAYの4種目は、どこから挑戦してもOK！",
+    "謎が解けたら、記録カードの同じ種目を選んで答えを入力！",
     "正解すると、記録スタンプと動物のひみつをゲット！",
     "すべての記録スタンプを集めると…？",
     "最終問題に正解したら、アンケートに回答しよう！\n後日抽選で素敵なプレゼントがもらえるかも！🎁"
@@ -726,11 +739,13 @@
     { id:1, no:"01", word:"THROW", kana:"なげる", color:"red",
       text:"一番遠くまで飛んだのはだれ？",
       answers:["アイ"], img:"", stampImg:"",
-      fact:{ emoji:"🦍", img:"gorilla", title:"ゴリラのドラミングのひみつ！",
-        body:["ゴリラが胸をたたく「ドラミング」。じつはグーではなく、手のひら（パー）でたたいているんだ！",
-              "ケンカのためではなく、「自分はここにいるぞ！」と気持ちを伝えるための合図なんだって。"],
-        stat:{ lead:"ちなみに、その音は森の中で、なんと約", value:"1", unit:"km", tail:"先まで届くことも！" },
-        note:"" } },
+      fact:{ emoji:"🦍", img:"gorilla", title:"ゴリラの怪力のひみつ！",
+        body:["ゴリラは、太くて長い腕と発達した筋肉を持つ力持ち！",
+              "大きな体を腕でも支えて歩いたり、木に登ったりすることができるんだ！"],
+        stat:{ lead:"ちなみに、握力は", value:"400〜500", unit:"kg", tail:"とも言われているよ！",
+               after:"ただし、実際に測った記録ではなく、正確な握力はまだわかっていないんだ！" },
+        note:["※人間の男子砲丸投げの世界記録は23.56m（砲丸の重さ7.26kg）！",
+              "※人間の握力は、専用握力計（GM150）で177.9kgという記録があるよ！"] } },
     { id:2, no:"02", word:"JUMP", kana:"とぶ", color:"yellow",
       text:"導き出された答えは？", placeholder:"数字で入力", inputmode:"numeric",
       answers:["134","134m","134メートル"], img:"", stampImg:"",
@@ -738,14 +753,16 @@
         body:["カンガルーは、後ろ足の腱（けん）がバネのように働き、着地したときのエネルギーを次のジャンプに再利用できるんだ！",
               "さらに、太くて長いしっぽを使って、ジャンプ中のバランスをとっているよ！"],
         stat:{ lead:"ちなみに、アカカンガルーのジャンプの世界記録は、なんと", value:"12.8", unit:"m", tail:"！" },
-        note:"※人間の立ち幅跳び（男子）の世界記録は3.71m" } },
+        note:["※人間の立ち幅跳び（男子）の世界記録は3.71m！",
+              "※人間の走り幅跳び（男子）の世界記録は8.95m（マイク・パウエル）！"] } },
     { id:3, no:"03", word:"RUN", kana:"はしる", color:"green",
       text:"1位の動物は誰？",
       answers:["バイソン"], img:"", stampImg:"",
-      fact:{ emoji:"🦬", img:"bison", title:"バイソンのくらしのひみつ！",
-        body:["バイソンは、地面にゴロゴロ寝転がる「砂あび」が大好き！ 体についた虫を追い払ったり、抜けかけた毛を落としたりするためなんだ。",
-              "冬は分厚いモコモコの毛のおかげで、雪がつもっても へっちゃら！"],
-        stat:null, note:"" } },
+      fact:{ emoji:"🦬", img:"bison", title:"アメリカバイソンの身体能力のひみつ！",
+        body:["アメリカバイソンは、体重が1トン近くにもなる巨体なのに、最高時速約55kmで走ることができるんだ！",
+              "しかも、約1.5mの高さの障害物を跳び越えることもできる、驚きの運動能力の持ち主！"],
+        stat:{ lead:"ちなみに、最高時速55kmを維持して100mを走ったと仮定すると、わずか約", value:"6.5", unit:"秒", tail:"！" },
+        note:["※人間の男子100m走の世界記録は9秒58（ウサイン・ボルト）！"] } },
     { id:4, no:"03+", word:"RUN 2", kana:"もうひと走り", color:"sky", bonusOf:3,
       text:"看板に書かれた〇〇は？", sub:"※答えは2つ。両方とも入力しよう！",
       blanks:[
@@ -753,19 +770,19 @@
         { label:"〇〇（2つ目）", answers:["こぶ","肩の間のこぶ","肩のこぶ"] }
       ],
       img:"", stampImg:"",
-      fact:{ emoji:"🦬", img:"bisonHead", title:"アメリカバイソンの身体能力のひみつ！",
-        body:["アメリカバイソンは、体重が900kgにもなる巨体なのに、最高時速約55kmで走ることができるんだ！",
-              "しかも、約1.5mの高さの障害物を跳び越えることもできる、驚きの運動能力の持ち主！"],
-        stat:{ lead:"ちなみに、最高時速55kmで100mを走り続けたとすると、わずか約", value:"6.5", unit:"秒", tail:"！" },
-        note:"※人間の100m走の世界記録は9秒58（ウサイン・ボルト）！" } },
+      fact:{ emoji:"🦬", img:"bisonHead", title:"バイソンの大きなコブのひみつ！",
+        body:["アメリカバイソンの頭の後ろにある大きなコブ。実は、長く伸びた背骨に支えられた、強い筋肉が集まっているんだ！",
+              "この筋肉で大きくて重たい頭を支え、冬には深さ1.2mもの雪をかき分けて草を探すこともあるよ！"],
+        stat:{ lead:"ちなみに、バイソンは全長約3.8m、体重", value:"1", unit:"トン", tail:"を超えることも！" },
+        note:["※2〜3歳のオスの頭を調べた研究では、その重さは平均約33.5kg！"] } },
     { id:5, no:"04", word:"RELAY", kana:"つなぐ", color:"blue",
       text:"バトンをつないで出てくるものは？",
       answers:["キリン","麒麟"], img:"", stampImg:"",
-      fact:{ emoji:"🦒", img:"", title:"キリンの首のひみつ！",
-        body:["あんなに長いキリンの首。じつは、首の骨のひとつひとつがとても大きいから長いんだ！",
-              "さらに、舌の長さは約50cm！ 舌を巻きつけて、高い木の葉っぱを器用に食べるよ。"],
-        stat:{ lead:"ちなみに、首の骨の数は、なんと人間と同じ", value:"7", unit:"個", tail:"！" },
-        note:"" } }
+      fact:{ emoji:"🦒", img:"", title:"キリンの走りのひみつ！",
+        body:["キリンは、長い脚を使って大きな歩幅で走ることができるんだ！"],
+        stat:{ lead:"走るキリンの研究では、1ストライドでなんと約", value:"9.2", unit:"m", tail:"も進むという数値が報告されているよ！",
+               after:"さらに、生まれたばかりの赤ちゃんも、わずか1時間ほどで立ち上がり、走り始めることができるんだ！" },
+        note:["※人間の男子4×100mリレーの世界記録は36秒84（ジャマイカ代表）！"] } }
   ];
 
   // 最終問題（すべてのスタンプを集めると現れる）
@@ -928,7 +945,15 @@
     if (ev.stampImg) return "";
     return '<div class="seal' + (animate ? " press" : "") + '" aria-hidden="true"><span><em>' + esc(ev.word) + '</em><strong>CLEAR</strong></span></div>';
   }
+  function isLocked(){
+    if (!LOCK_BEFORE_OPEN || /[?&]unlock=1/.test(location.search)) return false;
+    return Date.now() < Date.parse(OPEN_AT);
+  }
+  function lockHtml(){
+    return '<p class="locked"><b>🔒 まだ答えを入力できません</b>11月1日（日）9:00 スタート！ お楽しみに。</p>';
+  }
   function formHtml(ev){
+    if (isLocked()) return lockHtml();
     if (ev.blanks) {
       var f = '<form class="ans multi" data-id="' + ev.id + '" novalidate>';
       ev.blanks.forEach(function(b, i){
@@ -1158,7 +1183,13 @@
 
   /* ---- 豆知識の表示とパタパタ演出 ---- */
   var KANA = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン";
-  function tilesHtml(text){ return Array.from(String(text)).map(function(ch){ return '<i data-ch="' + esc(ch) + '">' + esc(ch) + "</i>"; }).join(""); }
+  function tilesHtml(text){
+    var cs = Array.from(String(text)).map(function(ch){ return '<i data-ch="' + esc(ch) + '">' + esc(ch) + "</i>"; });
+    var chars = Array.from(String(text)), k = chars.lastIndexOf("の");
+    var keep = /[！!？?]$/.test(text) ? (k >= 0 && chars.length - k - 1 <= 5 ? chars.length - k - 1 : 2) : 0;
+    if (keep > 1 && cs.length > keep) { var last = cs.splice(-keep, keep); cs.push('<span class="nb">' + last.join("") + "</span>"); }
+    return cs.join("");
+  }
   function factBoardHtml(ev){
     var stamp = ev.stampImg
       ? '<div class="fstamp img"><img src="' + esc(ev.stampImg) + '" alt=""></div>'
@@ -1170,17 +1201,19 @@
              "</div></div>";
   }
   function factHtml(ev){
-    var f = ev.fact;
+    var f = ev.fact, notes = !f.note ? [] : (Array.isArray(f.note) ? f.note : [f.note]);
     var h = '<section class="fact"><p class="ftitle" aria-label="' + esc(f.title) + '"><span class="emo" aria-hidden="true">' + esc(f.emoji || "") + "</span>" +
             '<span class="tiles" aria-hidden="true">' + tilesHtml(f.title) + "</span></p>" +
             '<div class="fbody">' + f.body.map(function(t){ return '<p class="fl">' + esc(t) + "</p>"; }).join("") + "</div>";
     if (f.stat) {
       h += '<div class="fstat fl"><p class="fs-lead">' + esc(f.stat.lead) + "</p>" +
-           '<div class="fs-val"><span class="tiles digits" role="img" aria-label="' + esc(f.stat.value + f.stat.unit) + '">' + tilesHtml(f.stat.value) + "</span>" +
-           '<b class="unit" aria-hidden="true">' + esc(f.stat.unit) + "</b>" + (f.stat.tail ? '<span class="tail">' + esc(f.stat.tail) + "</span>" : "") + "</div>" +
-           (f.note ? '<p class="fs-note">' + esc(f.note) + "</p>" : "") + "</div>";
-    } else if (f.note) {
-      h += '<p class="fs-note fl">' + esc(f.note) + "</p>";
+           '<div class="fs-val"><span class="vgrp"><span class="tiles digits' + (Array.from(f.stat.value).length > 4 ? " sm" : "") + '" role="img" aria-label="' + esc(f.stat.value + f.stat.unit) + '">' + tilesHtml(f.stat.value) + "</span>" +
+           '<b class="unit" aria-hidden="true">' + esc(f.stat.unit) + "</b>" + (f.stat.tail && f.stat.tail.length <= 2 ? '<span class="tail">' + esc(f.stat.tail) + "</span>" : "") + "</span>" +
+           (f.stat.tail && f.stat.tail.length > 2 ? '<span class="tail long">' + esc(f.stat.tail) + "</span>" : "") + "</div>" +
+           (f.stat.after ? '<p class="fs-after">' + esc(f.stat.after) + "</p>" : "") +
+           notes.map(function(n){ return '<p class="fs-note">' + esc(n) + "</p>"; }).join("") + "</div>";
+    } else if (notes.length) {
+      h += notes.map(function(n){ return '<p class="fs-note fl">' + esc(n) + "</p>"; }).join("");
     }
     return h + '<div class="fact-foot"><button type="button" class="replay" data-replay="' + ev.id + '">もう一度パタパタ ▶</button></div></section>';
   }
@@ -1197,7 +1230,7 @@
     setHalf(st, cur); setHalf(sb, cur);
     function step(){
       if (i >= seq.length) { ft.style.visibility = fb.style.visibility = "hidden"; if (done) done(); return; }
-      var next = seq[i], last = i === seq.length - 1, dur = last ? 300 : 110;
+      var next = seq[i], last = i === seq.length - 1, dur = last ? 520 : 240;
       setHalf(st, next); setHalf(ft, cur); setHalf(fb, next);
       ft.style.visibility = "visible"; fb.style.visibility = "hidden";
       tick(last ? 0.28 : 0.14);
@@ -1218,15 +1251,15 @@
     tiles.forEach(function(t){ t.textContent = ""; });
     tiles.forEach(function(t, k){
       var fin = t.getAttribute("data-ch"), d0 = start + k * gap;
-      var n = /[\s！!？?、。・「」（）.]/.test(fin) ? 0 : 3 + Math.floor(Math.random() * 4);
+      var n = /[\s！!？?、。・「」（）.〜]/.test(fin) ? 0 : 3 + Math.floor(Math.random() * 4);
       for (var j = 0; j <= n; j++) (function(j){
         setTimeout(function(){
           t.textContent = j === n ? fin : pool.charAt(Math.floor(Math.random() * pool.length));
           t.classList.remove("f"); void t.offsetWidth; t.classList.add("f");
           if (j % 2 === 0) tick(0.07);
-        }, d0 + j * 60);
+        }, d0 + j * 110);
       })(j);
-      end = Math.max(end, d0 + n * 60);
+      end = Math.max(end, d0 + n * 110);
     });
     return end;
   }
@@ -1246,12 +1279,12 @@
       stamp.style.visibility = ""; stamp.classList.remove("press"); void stamp.offsetWidth; stamp.classList.add("press");
       setTimeout(function(){ tick(0.45); buzz(30); }, 280);
     });
-    var t = flapTiles(tw, 200, 40, KANA) + 180;
+    var t = flapTiles(tw, 400, 85, KANA) + 350;
     lines.forEach(function(l, k){
-      setTimeout(function(){ l.style.opacity = ""; l.classList.add("reveal-line"); }, t + k * 300);
+      setTimeout(function(){ l.style.opacity = ""; l.classList.add("reveal-line"); }, t + k * 650);
     });
-    var tEnd = t + lines.length * 300;
-    if (dg) tEnd = flapTiles(dg, tEnd - 150, 140, "0123456789") + 200;
+    var tEnd = t + lines.length * 650;
+    if (dg) tEnd = flapTiles(dg, tEnd - 250, 260, "0123456789") + 300;
     if (onDone) setTimeout(onDone, tEnd + 200);
   }
   document.addEventListener("click", function(e){
@@ -1527,6 +1560,7 @@
     var form = e.target.closest("form.ans");
     if (!form) return;
     e.preventDefault();
+    if (isLocked()) { toast("11月1日（日）9:00から答えを入力できます。"); return; }
 
     /* 最終問題 */
     if (form.hasAttribute("data-final")) {
@@ -1635,6 +1669,10 @@
   startedAt();
   renderToday();
   renderAll();
+  if (isLocked()) {   // ページを開いたまま9:00を迎えたら自動で入力欄を表示
+    var wait = Date.parse(OPEN_AT) - Date.now() + 500;
+    if (wait < 86400000) setTimeout(function(){ renderAll(); toast("スタート！ 答えを入力できるようになりました。"); }, wait);
+  }
 
   /* ---- ?cert=1：完走証の作成欄へ（アンケートの完了画面からのリンク用） ---- */
   if (/[?&]cert=1/.test(qs)) {
