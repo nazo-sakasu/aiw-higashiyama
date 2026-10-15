@@ -311,6 +311,7 @@
   .rows dd small{ display:block; padding-left:1em; text-indent:-1em; white-space:pre-line; font-size:.76rem; color:var(--red); line-height:1.6; }
   .rows dd a{ color:var(--blue); font-family:var(--font-latin); font-weight:700; letter-spacing:.02em; }
   ol.howto{ list-style:none; margin:0; padding:0; counter-reset:h; }
+  ol.howto li span{ white-space:pre-line; }
   ol.howto li{ display:grid; grid-template-columns:28px 1fr; gap:10px; padding:9px 0; border-top:1px solid var(--rule); font-size:.92rem; }
   ol.howto li::before{
     counter-increment:h; content:counter(h);
@@ -594,8 +595,8 @@
       <div class="panel-body notes" id="notesBody"></div>
     </details>
     <section class="panel hint" id="hint">
-      <p>謎解きがわからないときは、ウィーケン！公式LINEでヒントをお届けします。</p>
-      <a id="hintBtn" href="#" target="_blank" rel="noopener">公式LINEでヒントを見る</a>
+      <p>解き方が分からないときは、アイシン労働組合公式LINEでヒントをお届けします。</p>
+      <a id="hintBtn" href="#" target="_blank" rel="noopener">アイシン労働組合公式LINEでヒントを見る</a>
     </section>
   </div>
 </main>
@@ -665,14 +666,14 @@
   /* ================= 設定 ================= */
   var STORE_KEY = "asf-higashiyama-2026";
   var START_KEY = "asf-higashiyama-start-2026";
-  var LINE_URL  = "https://lin.ee/totsOhQ";
+  var LINE_URL  = "https://line.me/R/ti/p/@618zurkn";   // アイシン労働組合 公式LINE
   var SURVEY_URL  = "https://docs.google.com/forms/d/e/1FAIpQLSdwKOMvpBn0E_nc8qR-AsYPmCbmuGQvLXwp3FeNtOVYfcg7UA/viewform";   // ★ アンケート（最終問題に正解すると自動で移動）
   var SURVEY_WAIT = 10;   // 自動で移動するまでの秒数
 
   var ORG    = "アイシン・エーアイダブリュ労働組合";
   var VENUE  = "東山動植物園";
   var PERIOD = { year:"2026年", from:["11月1日","日"], to:["11月30日","月"] };
-  var CLOSED_NOTE = "※お出かけ前に、\n東山動植物園の休園日をご確認ください。";
+  var CLOSED_NOTE = "※お出かけ前に、東山動植物園の休園日をご確認ください。";
   var VENUE_URL   = "https://www.higashiyama.city.nagoya.jp/01_annai/01_01kaien";   // 東山動植物園 公式「開園時間・休園日・入園料」
 
   // 開催日程（日本時間）。休園日は公式の規則「毎週月曜（月曜が祝日・振替休日なら直後の平日）」から算出
@@ -684,10 +685,10 @@
   var CERT_NICK_MAX = 12;   // 完走証のニックネーム最大文字数
 
   var ABOUT = [
-    { label:"開催期間", value:["2026年11月1日（日）〜","11月30日（月）"], note:"※お出かけ前に、\n東山動植物園の休園日を\nご確認ください。" },
+    { label:"開催期間", value:["2026年11月1日（日）〜","11月30日（月）"], note:"※お出かけ前に、東山動植物園の休園日をご確認ください。" },
     { label:"会場",     value:"東山動植物園", link:{ href:VENUE_URL, label:"公式サイト（開園時間・休園日）" } },
     { label:"主催",     value:["アイシン・エーアイダブリュ","労働組合"] },
-    { label:"緊急連絡先", tel:"080-6671-3738", value:"（担当：湯前）", note:"※イベント期間外のご連絡は\nご遠慮ください。" }
+    { label:"緊急連絡先", tel:"080-6671-3738", value:"（担当：湯前）", note:"※イベント期間外のご連絡はご遠慮ください。" }
   ];
 
   var HOW_TO = [
@@ -696,7 +697,7 @@
     "問題が解けたら、記録カードで同じ種目を選んで答えを入力！",
     "正解すると、記録スタンプと動物のひみつをゲット！",
     "すべての記録スタンプを集めると…？",
-    "最終問題に正解したら、アンケートに回答しよう！（後日抽選）"
+    "最終問題に正解したら、アンケートに回答しよう！\n後日抽選で素敵なプレゼントがもらえるかも！🎁"
   ];
 
   var NOTES = [
