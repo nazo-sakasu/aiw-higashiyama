@@ -813,7 +813,7 @@
       fact:{ emoji:"🦒", img:"giraffe", title:"キリンの走りのひみつ！",
         body:["キリンは、長い脚を使って大きな歩幅で走ることができるんだ！"],
         stat:{ lead:"走るキリンの研究では、1ストライドでなんと約", value:"9.2", unit:"m", tail:"も進むという数値が報告されているよ！",
-               after:"さらに、生まれたばかりの赤ちゃんも、わずか1時間ほどで立ち上がり、走り始めることができるんだ！" },
+               after:"さらに、生まれたばかりの赤ちゃんも、わずか1時間ほどで立ち上がり、すぐに歩き始めることができるんだ！" },
         note:["※人間の男子4×100mリレーの世界記録は36秒84（ジャマイカ代表）！"] } }
   ];
 
@@ -1617,6 +1617,19 @@
     input.classList.remove("shake"); void input.offsetWidth; input.classList.add("shake");
   }
 
+  /* 答えの欄に初めて触れたら answer_start（種目ごとに1回／ページ表示中） */
+  var started = {};
+  document.addEventListener("focusin", function(e){
+    var f = e.target.closest && e.target.closest("form.ans");
+    if (!f) return;
+    var key = f.hasAttribute("data-final") ? "FINAL" : f.getAttribute("data-id");
+    if (started[key]) return;
+    started[key] = 1;
+    if (key === "FINAL") { track("answer_start", { step:"FINAL" }); return; }
+    var ev = EVENTS.filter(function(x){ return x.id === +key; })[0];
+    if (ev) track("answer_start", { step: ev.word, step_no: ev.id });
+  });
+
   document.addEventListener("keydown", function(e){
     if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
     var inp = e.target;
@@ -1688,7 +1701,7 @@
       var unlocked = EVENTS.filter(function(x){ return x.bonusOf === id; })[0];
       var clearNow = !unlocked && EVENTS.every(function(x){ return !!state[x.id]; });
       saveState();
-      track("stamp_get", { step: ev.word, step_no: id });
+      track("stamp_get", { step: ev.word, step_no: id, stamp_count: doneCount() });
       renderCard(ev, { animate:true, unlocked: unlocked ? unlocked.id : 0, allClear: clearNow });
       var card = document.getElementById("ev-" + id);
       setTimeout(function(){ card.scrollIntoView({ behavior:"smooth", block:"start" }); }, 60);
