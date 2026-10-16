@@ -652,6 +652,51 @@
     position:absolute; inset:0; z-index:6; display:flex; flex-direction:column; gap:10px; justify-content:center; padding:12px; overflow:auto;
     background:rgba(19,17,14,.94); animation:fadeIn .4s ease both;
   }
+  /* RELAY：称号 */
+  .rm-hero{ display:flex; align-items:center; justify-content:center; gap:16px; }
+  .rmedal{ --c0:#FFF4BF; --c1:#F9CB3C; --c2:#E4A20E; --c3:#B57405; --ink:#5A3A00; --rim:#C98A08; position:relative; flex:none; width:104px; height:142px; }
+  .rmedal .rib{ position:absolute; left:50%; top:0; width:76px; height:78px; margin-left:-38px;
+    background:linear-gradient(90deg, var(--red) 0 20%, var(--yellow) 20% 40%, var(--green) 40% 60%, var(--sky) 60% 80%, var(--blue) 80%);
+    clip-path:polygon(0 0, 30% 0, 50% 64%, 70% 0, 100% 0, 62% 100%, 38% 100%); }
+  .rmedal .cn{ position:absolute; left:0; bottom:0; width:104px; height:104px; border-radius:50%; display:grid; place-content:center; text-align:center; color:var(--ink);
+    background:radial-gradient(circle at 34% 28%, var(--c0) 0, var(--c1) 28%, var(--c2) 66%, var(--c3) 100%);
+    box-shadow:inset 0 0 0 4px var(--rim), inset 0 0 0 6px rgba(255,255,255,.55), 0 0 0 3px var(--ink), 0 8px 18px rgba(0,0,0,.45); overflow:hidden; }
+  .rmedal .cn::after{ content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.5) 44%, transparent 56%); animation:shine 2.6s ease-in-out infinite; }
+  @keyframes shine{ 0%,55%{ transform:translateX(-120%); } 100%{ transform:translateX(120%); } }
+  .rmedal small{ font:800 .56rem/1 var(--font-latin); letter-spacing:.18em; }
+  .rmedal b{ font:900 2.6rem/1.05 var(--font-jp); }
+  .rmedal.drop{ animation:mDrop .9s cubic-bezier(.3,1.4,.5,1) .15s both; }
+  @keyframes mDrop{ from{ transform:translateY(-70px) rotate(-14deg) scale(.6); opacity:0; } 60%{ opacity:1; } to{ transform:none; } }
+  .t-silver{ --c0:#FFFFFF; --c1:#E6E9ED; --c2:#B9C0C8; --c3:#7E8894; --ink:#2F353C; --rim:#9AA3AD; }
+  .t-bronze{ --c0:#FFE6CC; --c1:#E8A66B; --c2:#C0763A; --c3:#8A4B1E; --ink:#3E1E06; --rim:#A9612C; }
+  .t-legend{ --c0:#FFFFFF; --c1:#C9F1FF; --c2:#7CC8F2; --c3:#2E78C8; --ink:#0E2F5A; --rim:#5AA8E0; }
+  .t-none{ --c0:#FFFFFF; --c1:#FBF3E2; --c2:#E9DDC4; --c3:#C9B999; --ink:#1F1B16; --rim:#B8A684; }
+  .t-none .rib{ filter:grayscale(1) brightness(1.3); opacity:.5; }
+  .rm-txt{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .rm-txt em{ font-style:normal; font-weight:900; font-size:.92rem; line-height:1.35; color:var(--yellow); }
+  .rm-txt b{ font:800 2.7rem/1 var(--font-latin); color:#fff; font-variant-numeric:tabular-nums; }
+  .rm-txt b i{ font:900 .9rem var(--font-jp); font-style:normal; margin-left:3px; color:#A29C92; }
+  .rm-txt span{ font-size:.74rem; font-weight:800; color:#E6E0D6; }
+  .rm-txt .nb{ align-self:flex-start; padding:2px 8px; border-radius:4px; background:var(--red); color:#fff; font:800 .62rem/1.5 var(--font-latin); letter-spacing:.18em; animation:blink .6s steps(2) 4; }
+  .rm-tiers{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:0; padding:0; list-style:none; }
+  .rm-tiers li{ display:flex; align-items:center; justify-content:center; gap:5px; padding:6px 4px; border-radius:8px; background:#24201C; border:1.5px solid #3A342D; font:800 .8rem/1 var(--font-latin); color:#8C857A; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .rm-tiers li i{ font:700 .58rem var(--font-jp); font-style:normal; margin-left:1px; }
+  .rm-tiers li b{ display:grid; place-items:center; width:20px; height:20px; border-radius:50%; font:900 .66rem/1 var(--font-jp); color:var(--ink); background:radial-gradient(circle at 34% 28%, var(--c0), var(--c1) 40%, var(--c2)); opacity:.45; }
+  .rm-tiers li.got{ border-color:var(--c2); color:#fff; }
+  .rm-tiers li.got b{ opacity:1; }
+  .rm-share{ align-self:center; display:inline-flex; align-items:center; gap:8px; border:2px solid var(--surface); border-radius:999px; background:var(--sky); color:#fff; font:inherit; font-weight:900; font-size:.95rem; padding:10px 22px; box-shadow:0 3px 0 #000; cursor:pointer; }
+  .rm-share::before{ content:""; width:16px; height:16px; background:currentColor; clip-path:polygon(50% 0, 85% 35%, 62% 35%, 62% 70%, 38% 70%, 38% 35%, 15% 35%); box-shadow:none; -webkit-mask:linear-gradient(#000 0 0); }
+  .rm-share:active{ transform:translateY(2px); box-shadow:0 1px 0 #000; }
+  .rm-share:disabled{ opacity:.6; }
+  .rm-card{ text-align:center; }
+  .rm-card img{ display:block; width:min(100%, 300px); margin:0 auto; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.5); }
+  .rm-card p{ margin:6px 0 0; font-size:.72rem !important; color:#A29C92; }
+  .rm-sep{ display:flex; align-items:center; gap:10px; margin-top:6px; color:var(--yellow); font:800 .62rem/1 var(--font-latin); letter-spacing:.24em; }
+  .rm-sep::before, .rm-sep::after{ content:""; flex:1; height:1px; background:#3A342D; }
+  .relay-rec b.vs{ font-size:1.5rem; margin-top:8px; }
+  .relay-best .chip{ display:inline-grid; place-items:center; width:22px; height:22px; margin-right:6px; vertical-align:-5px; border-radius:50%; font:900 .7rem/1 var(--font-jp); color:var(--ink);
+    background:radial-gradient(circle at 34% 28%, var(--c0), var(--c1) 40%, var(--c2)); box-shadow:0 0 0 1.5px var(--ink); }
+  .relay-best .chip.t-gold, .rm-tiers .t-gold{ --c0:#FFF4BF; --c1:#F9CB3C; --c2:#E4A20E; --c3:#B57405; --ink:#5A3A00; }
   .relay-done{ justify-content:flex-start; }
   .relay-done > :first-child{ margin-top:auto; }
   .relay-done > :last-child{ margin-bottom:auto; }
@@ -1076,6 +1121,13 @@
     { name:"スマトラトラ", emoji:"🐅", img:"", spd:1.1, style:"run", say:"パワフルな走り！" },
     { name:"アジアゾウ", emoji:"🐘", img:"", spd:0.9, style:"heavy", say:"地ひびきを立てて前進！" },
     { name:"コツメカワウソ", emoji:"🦦", img:"", spd:1.0, style:"run", say:"ラストスパート！" }
+  ];
+  // RELAY：目標タイムの称号（秒）。上から順に判定。hidden は取るまで「？？？」表示
+  var RELAY_MEDALS = [
+    { id:"legend", t:27.0, label:"LEGEND", kanji:"伝", name:"伝説のアンカー", hidden:true },
+    { id:"gold",   t:30.0, label:"GOLD",   kanji:"金", name:"金メダル" },
+    { id:"silver", t:36.0, label:"SILVER", kanji:"銀", name:"銀メダル" },
+    { id:"bronze", t:42.0, label:"BRONZE", kanji:"銅", name:"銅メダル" }
   ];
 
   // 最終問題（すべてのスタンプを集めると現れる）
@@ -1939,7 +1991,7 @@
              '<button type="button" class="relay-open" data-relay="1">' + koala + 'リレーに出走する</button></div>';
     }
     return '<div class="relay-box"><p>🏃 リレーオーダー表（この順番に、紙の園内MAPの動物を線で結ぼう！）</p>' + orderHtml() +
-           (state.relayBest ? '<p class="relay-best">ベスト記録 <b>' + state.relayBest.toFixed(1) + '</b> 秒</p>' : "") +
+           (state.relayBest ? '<p class="relay-best">' + (function(m){ return m ? '<span class="chip t-' + m.id + '">' + m.kanji + "</span>" : ""; })(relayMedal(state.relayBest)) + 'ベスト記録 <b>' + state.relayBest.toFixed(1) + '</b> 秒</p>' : "") +
            '<button type="button" class="replay relay-again" data-relay="1">もう一度走る ▶</button></div>';
   }
   function runnerFace(r){ return r.img ? '<img src="' + esc(r.img) + '" alt="">' : esc(r.emoji); }
@@ -2182,21 +2234,128 @@
     fanfare(); buzz([30, 50, 30]);
     var best = state.relayBest && state.relayBest < time ? state.relayBest : time, isBest = !state.relayBest || time < state.relayBest;
     state.relayDone = 1; state.relayBest = Math.round(best * 10) / 10; saveState();
-    later(function(){
-      if (!rl) return;
-      var dn = document.getElementById("relayDone");
-      dn.innerHTML = "<h3><small>FINISH</small>リレーオーダー表 完成！</h3>" +
-        '<div class="relay-rec"><div><small>TIME</small><b>' + time.toFixed(1) + "<i>秒</i></b>" + (isBest ? "<em>ベスト記録！</em>" : "<em>ベスト " + state.relayBest.toFixed(1) + "秒</em>") + "</div>" +
-        "<div><small>NICE BATON</small><b>" + rl.perfect + "<i>/ " + (LEGS - 1) + "</i></b><em>" + (win ? "🦁ライバルに勝った！" : "🦁ライバルまで あと" + (time - rivalT).toFixed(1) + "秒") + "</em></div></div>" +
-        orderHtml() +
-        "<p>紙の園内MAPで、<b>1走から順番に</b><br>動物たちを鉛筆で線で結んでみよう！</p>" +
-        '<div class="relay-btns"><button type="button" class="replay" id="relayAgain">もう一度走る ▶</button>' +
-        '<button type="button" class="cer-go" id="relayEnd">記録カードにもどる</button></div>';
-      relayEl.classList.add("fin"); dn.hidden = false; dn.scrollTop = 0;
-      document.getElementById("relayEnd").onclick = function(){ closeRelay(); var ev = EVENTS.filter(function(x){ return x.relay; })[0]; renderCard(ev); goTo(ev.id); };
-      document.getElementById("relayAgain").onclick = function(){ openRelay(); };
-    }, 1400);
-    track("relay_complete", { time_sec: Math.round(time * 10) / 10, perfect: rl.perfect, win: win ? 1 : 0 });
+    var res = { time: time, perfect: rl.perfect, win: win, rivalT: rivalT, isBest: isBest, medal: relayMedal(time) };
+    later(function(){ if (rl) showRelayResult(res); }, 1400);
+    track("relay_complete", { time_sec: Math.round(time * 10) / 10, perfect: rl.perfect, win: win ? 1 : 0, medal: res.medal ? res.medal.id : "none" });
+  }
+  function relayMedal(t){ for (var i = 0; i < RELAY_MEDALS.length; i++) if (t <= RELAY_MEDALS[i].t) return RELAY_MEDALS[i]; return null; }
+  function medalHtml(m, cls){
+    return '<div class="rmedal ' + (m ? "t-" + m.id : "t-none") + (cls ? " " + cls : "") + '"><i class="rib"></i><div class="cn"><small>' + (m ? m.label : "FINISH") + "</small><b>" + (m ? m.kanji : "完") + "</b></div></div>";
+  }
+  function tiersHtml(best){
+    var bm = relayMedal(best);
+    return '<ul class="rm-tiers">' + RELAY_MEDALS.slice().reverse().map(function(m){
+      var got = best && best <= m.t, show = !m.hidden || got;
+      return '<li class="t-' + m.id + (got ? " got" : "") + '"><b>' + (show ? m.kanji : "？") + "</b>" + (show ? m.t.toFixed(1) + "<i>秒</i>" : "？？.？") + "</li>";
+    }).join("") + "</ul>";
+  }
+  function showRelayResult(res){
+    var dn = document.getElementById("relayDone"), m = res.medal, best = state.relayBest;
+    var title = m ? m.name + "獲得！" : "完走！ 銅メダルは" + RELAY_MEDALS[RELAY_MEDALS.length - 1].t.toFixed(1) + "秒以内";
+    var nextM = null;
+    for (var i = RELAY_MEDALS.length - 1; i >= 0; i--) { if (res.time > RELAY_MEDALS[i].t && !RELAY_MEDALS[i].hidden) { nextM = RELAY_MEDALS[i]; break; } }
+    var nextTxt = m && nextM && m !== nextM ? "<span>" + nextM.name + "まで あと" + (res.time - nextM.t).toFixed(1) + "秒！</span>" : "";
+    dn.innerHTML = "<h3><small>FINISH</small>リレーオーダー表 完成！</h3>" +
+      '<div class="rm-hero">' + medalHtml(m, "drop") +
+        '<div class="rm-txt"><em>' + esc(title) + "</em><b>" + res.time.toFixed(1) + "<i>秒</i></b>" +
+        (res.isBest ? '<strong class="nb">NEW RECORD</strong>' : "<span>ベスト " + best.toFixed(1) + "秒</span>") + nextTxt + "</div></div>" +
+      tiersHtml(best) +
+      '<div class="relay-rec"><div><small>NICE BATON</small><b>' + res.perfect + "<i>/ " + (LEGS - 1) + "</i></b></div>" +
+        "<div><small>RIVAL</small><b class=\"vs\">" + (res.win ? "WIN" : "LOSE") + "</b><em>" + (res.win ? "🦁ライバルに勝った！" : "🦁あと" + (res.time - res.rivalT).toFixed(1) + "秒") + "</em></div></div>" +
+      '<button type="button" class="rm-share" id="relayShare">記録をシェアする</button>' +
+      '<div class="rm-card" id="relayCard" hidden><img alt="リレーの記録" id="relayCardImg"><p>画像を長押しで保存できます</p></div>' +
+      '<div class="rm-sep"><span>ORDER SHEET</span></div>' +
+      orderHtml() +
+      "<p>紙の園内MAPで、<b>1走から順番に</b><br>動物たちを鉛筆で線で結んでみよう！</p>" +
+      '<div class="relay-btns"><button type="button" class="replay" id="relayAgain">もう一度走る ▶</button>' +
+      '<button type="button" class="cer-go" id="relayEnd">記録カードにもどる</button></div>';
+    relayEl.classList.add("fin"); dn.hidden = false; dn.scrollTop = 0;
+    if (m) { later(function(){ tick(0.6); buzz([20, 40, 60]); }, 650); }
+    document.getElementById("relayEnd").onclick = function(){ closeRelay(); var ev = EVENTS.filter(function(x){ return x.relay; })[0]; renderCard(ev); goTo(ev.id); };
+    document.getElementById("relayAgain").onclick = function(){ openRelay(); };
+    document.getElementById("relayShare").onclick = function(){ shareRelay(res, this); };
+  }
+
+  /* 記録カード画像（オーダー表は謎の答えにつながるので載せない） */
+  var MEDAL_COL = {
+    legend:{ c:["#FFFFFF","#C9F1FF","#7CC8F2","#2E78C8"], ink:"#0E2F5A", rim:"#5AA8E0" },
+    gold:  { c:["#FFF4BF","#F9CB3C","#E4A20E","#B57405"], ink:"#5A3A00", rim:"#C98A08" },
+    silver:{ c:["#FFFFFF","#E6E9ED","#B9C0C8","#7E8894"], ink:"#2F353C", rim:"#9AA3AD" },
+    bronze:{ c:["#FFE6CC","#E8A66B","#C0763A","#8A4B1E"], ink:"#3E1E06", rim:"#A9612C" },
+    none:  { c:["#FFFFFF","#FBF3E2","#E9DDC4","#C9B999"], ink:"#1F1B16", rim:"#B8A684" }
+  };
+  function drawRelayCard(res){
+    var W = 1080, H = 1350, M = 40;
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    var x = cv.getContext("2d");
+    var JP = '"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif', LT = '"Jost","Futura","Avenir Next",sans-serif';
+    var cs = getComputedStyle(document.documentElement), col = function(n){ return cs.getPropertyValue(n).trim(); };
+    var INK = col("--ink"), CREAM = col("--cream"), m = res.medal, mc = MEDAL_COL[m ? m.id : "none"];
+    x.fillStyle = INK; x.fillRect(0, 0, W, H);
+    roundRect(x, 18, 18, W - 36, H - 36, 30); x.fillStyle = CREAM; x.fill();
+    var bands = document.querySelectorAll(".band-img"), iw = W - 2 * M, ih = Math.round(iw * 309 / 1100), bh = 118;
+    x.save(); roundRect(x, M, M, iw, H - 2 * M, 18); x.clip();
+    try {
+      if (bands[0]) x.drawImage(bands[0], M, M, iw, ih);
+      if (bands[1]) { var sh = bh * 1100 / iw; x.drawImage(bands[1], 0, (309 - sh) / 2, 1100, sh, M, H - M - bh, iw, bh); }
+    } catch(e){}
+    x.restore();
+    x.fillStyle = INK; x.fillRect(M, M + ih, iw, 6); x.fillRect(M, H - M - bh - 6, iw, 6);
+    x.textAlign = "center"; x.textBaseline = "alphabetic";
+    var top = M + ih + 6;
+    // 見出し
+    x.fillStyle = col("--red"); x.font = "italic 800 28px " + LT; spaced(x, "EVENT 04 ・ RELAY", W / 2, top + 54, 8);
+    x.fillStyle = INK; x.font = "900 54px " + JP; x.fillText("バトンをつなげ！", W / 2, top + 116);
+    // メダル（リボン＋コイン）
+    var cx = W / 2, R = 104, cy = top + 136 + 64 + R, rt = cy - R - 64;
+    var rib = ["--red","--yellow","--green","--sky","--blue"];
+    x.save(); x.beginPath(); x.moveTo(cx - 100, rt); x.lineTo(cx - 32, rt); x.lineTo(cx, rt + 110); x.lineTo(cx + 32, rt); x.lineTo(cx + 100, rt); x.lineTo(cx + 26, cy - 40); x.lineTo(cx - 26, cy - 40); x.closePath(); x.clip();
+    rib.forEach(function(n, i){ x.fillStyle = col(n); x.fillRect(cx - 100 + i * 40, rt, 40, 220); }); x.restore();
+    var g = x.createRadialGradient(cx - 34, cy - 40, 8, cx, cy, R);
+    g.addColorStop(0, mc.c[0]); g.addColorStop(.3, mc.c[1]); g.addColorStop(.72, mc.c[2]); g.addColorStop(1, mc.c[3]);
+    x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.fillStyle = g; x.fill(); x.lineWidth = 7; x.strokeStyle = INK; x.stroke();
+    x.beginPath(); x.arc(cx, cy, R - 15, 0, Math.PI * 2); x.lineWidth = 4; x.strokeStyle = mc.rim; x.stroke();
+    x.fillStyle = mc.ink; x.font = "800 22px " + LT; spaced(x, m ? m.label : "FINISH", cx, cy - 30, 6);
+    x.font = "900 92px " + JP; x.fillText(m ? m.kanji : "完", cx, cy + 60);
+    // 称号・タイム
+    var ty = cy + R + 70;
+    x.fillStyle = INK; x.font = "900 48px " + JP; x.fillText(m ? m.name + " 獲得！" : "完走！", W / 2, ty);
+    x.font = "800 136px " + LT; var tt = res.time.toFixed(1), tw = x.measureText(tt).width;
+    x.font = "900 42px " + JP; var sw = x.measureText("秒").width;
+    var tx = W / 2 - (tw + sw + 10) / 2; x.textAlign = "left";
+    x.font = "800 136px " + LT; x.fillText(tt, tx, ty + 142);
+    x.font = "900 42px " + JP; x.fillText("秒", tx + tw + 10, ty + 142);
+    x.textAlign = "center";
+    // ナイスバトン／ライバル
+    var by = ty + 214;
+    x.fillStyle = "rgba(31,27,22,.18)"; x.fillRect(W / 2 - 1, by - 40, 2, 84);
+    x.fillStyle = col("--red"); x.font = "800 22px " + LT; spaced(x, "NICE BATON", W / 2 - 220, by - 12, 5); spaced(x, "RIVAL", W / 2 + 220, by - 12, 5);
+    x.fillStyle = INK; x.font = "800 50px " + LT; x.fillText(res.perfect + " / " + (LEGS - 1), W / 2 - 220, by + 42);
+    x.font = "900 40px " + JP; x.fillText(res.win ? "勝利！" : "あと" + (res.time - res.rivalT).toFixed(1) + "秒", W / 2 + 220, by + 40);
+    // 主催
+    x.fillStyle = "#6E655A"; x.font = "700 22px " + JP;
+    x.fillText("なぞときウォークラリー ANIMAL SPORTS FESTIVAL in 東山動植物園", W / 2, H - M - bh - 30);
+    return cv;
+  }
+  function shareRelay(res, btn){
+    btn.disabled = true; btn.textContent = "作成中…";
+    var nick = state.nick || "";
+    loadCertFonts(nick + "バトンをつなげ獲得完走勝利あと秒伝説のアンカー金銀銅メダル").then(function(){
+      return new Promise(function(r){ drawRelayCard(res).toBlob(function(b){ r(b); }, "image/png"); });
+    }).then(function(blob){
+      btn.disabled = false; btn.textContent = "記録をシェアする";
+      if (!blob) return;
+      var url = URL.createObjectURL(blob), box = document.getElementById("relayCard");
+      document.getElementById("relayCardImg").src = url; box.hidden = false;
+      var text = "RELAY「バトンをつなげ！」" + (res.medal ? res.medal.name + "獲得！" : "完走！") + " タイム " + res.time.toFixed(1) + "秒（ナイスバトン " + res.perfect + "/" + (LEGS - 1) + "）";
+      var file = null; try { file = new File([blob], "ASF_relay.png", { type:"image/png" }); } catch(e){}
+      if (file && navigator.canShare && navigator.canShare({ files:[file] })) {
+        navigator.share({ files:[file], text:text }).then(function(){ track("relay_share", { medal: res.medal ? res.medal.id : "none" }); }).catch(function(){});
+      } else if (navigator.share) {
+        navigator.share({ text:text }).then(function(){ track("relay_share", { medal: res.medal ? res.medal.id : "none" }); }).catch(function(){});
+      }
+      setTimeout(function(){ box.scrollIntoView({ behavior:"smooth", block:"center" }); }, 120);
+    }).catch(function(){ btn.disabled = false; btn.textContent = "記録をシェアする"; });
   }
 
   if (/[?&]debug=1/.test(location.search)) window.__relay = { get:function(){ return rl; }, foot:relayFoot, pass:relayPass, LEG:LEG, ZONE:ZONE };
