@@ -544,7 +544,14 @@
   @keyframes popIn{ 0%{ opacity:0; transform:translate(-50%,-30%) scale(.8); } 20%,75%{ opacity:1; transform:translate(-50%,-50%) scale(1); } 100%{ opacity:0; transform:translate(-50%,-60%); } }
   /* RELAY：バトンリレー */
   .relay-head .relay-count small{ font-size:.8rem; }
-  .relay-hint{ margin:6px 0 8px; }
+  .relay-hint{ margin:6px 0 8px; max-height:5em; overflow:hidden; transition:max-height .35s ease, margin .35s ease, opacity .25s; }
+  .relay.racing .relay-hint{ max-height:0; margin:0 0 6px; opacity:0; }
+  /* スマホのダブルタップ・ピンチで画面が拡大しないように */
+  .relay{ touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; overscroll-behavior:contain; }
+  .relay-done{ touch-action:pan-y; }
+  .rm-card img{ -webkit-touch-callout:default; }
+  button, a, [role="button"]{ touch-action:manipulation; }
+  @media (max-height:720px){ .foot{ height:88px; } .relay-feet{ margin-top:6px; } .relay-meter{ margin-top:6px; } }
   .relay-stage.flash::after{ content:""; position:absolute; inset:0; z-index:8; background:#fff; pointer-events:none; animation:flash .35s ease-out both; }
   @keyframes flash{ from{ opacity:.85; } to{ opacity:0; } }
   .relay-cd{ animation:cdIn .35s cubic-bezier(.2,.9,.3,1.3) both; }
@@ -2004,7 +2011,7 @@
   function openRelay(){
     unlockAudio();
     if (rl) stopRelay();
-    relayEl.hidden = false; relayEl.classList.remove("fin"); document.body.classList.add("lock");
+    relayEl.hidden = false; relayEl.classList.remove("fin", "racing"); document.body.classList.add("lock"); zoomLock(true);
     document.getElementById("relayDone").hidden = true;
     var world = document.getElementById("relayWorld");
     world.innerHTML = '<img class="relay-track" alt="" draggable="false" src="' + ART.track + '">';
@@ -2039,7 +2046,13 @@
     track("relay_open", {});
   }
   function stopRelay(){ if (!rl) return; if (rl.raf) cancelAnimationFrame(rl.raf); rl.timers.forEach(clearTimeout); rl = null; }
-  function closeRelay(){ stopRelay(); relayEl.hidden = true; document.body.classList.remove("lock"); }
+  function closeRelay(){ stopRelay(); relayEl.hidden = true; document.body.classList.remove("lock"); zoomLock(false); }
+  // リレー中は画面の拡大を止める（iPhoneで連打すると拡大されたままになるのを防ぐ）。閉じたら元に戻す
+  var VP = document.querySelector('meta[name="viewport"]'), VP0 = VP ? VP.getAttribute("content") : "";
+  function zoomLock(on){
+    if (!VP) return;
+    VP.setAttribute("content", on ? "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" : VP0);
+  }
   function later(fn, ms){ var id = setTimeout(fn, ms); if (rl) rl.timers.push(id); return id; }
 
   function layoutZone(){   // 次の受け渡しゾーンを、自分のレーンに描く
@@ -2083,7 +2096,7 @@
     later(function(){
       if (!rl || !rl.ready) return;
       rl.ready = false; rl.started = true;
-      cdShow("パン！"); bang(); buzz(40);
+      cdShow("パン！"); bang(); buzz(40); relayEl.classList.add("racing");
       var st = document.getElementById("relayStage"); st.classList.remove("flash"); void st.offsetWidth; st.classList.add("flash");
       mcSay(rl.cur);
       later(function(){ c.hidden = true; }, 600);
@@ -2103,11 +2116,12 @@
     if (!rl.started) { if (rl.ready) falseStart(); return; }
     var c = rl.cur;
     if (rl.lockT > 0) return;
-    if (rl.foot === foot) {   // 同じ足が続くと、つまずく
-      c.v *= 0.55; c.b = 0.6; rl.trips++; rl.foot = foot; buzz(35); tick(0.3);
-      if (rl.trips <= 2 || rl.trips % 6 === 0) relayPop("<small>TRIP!</small><strong>同じ足が続いた！</strong><em>左右交互にトントン</em>", "warn");
+    if (rl.foot === foot) {   // 同じ足が続いたら加速しない（減速はさせない）。3回続いたら案内
+      rl.same = (rl.same || 0) + 1; c.b = 0.3;
+      if (rl.same === 3) { rl.trips++; relayPop("<small>LEFT・RIGHT</small><strong>左右交互にトントン！</strong><em>同じ足ばかりだと進まないよ</em>", "warn"); }
       return;
     }
+    rl.same = 0;
     rl.foot = foot; rl.steps++;
     var spd = c.info.spd || 1;
     c.v = Math.min(VMAX * spd, c.v + IMP * spd);
@@ -2127,7 +2141,7 @@
     var g = n.u - c.u;
     if (n.state === "wait") { relayPop("<small>WAIT</small><strong>まだ早い！</strong><em>次の走者が走り出してから渡そう</em>"); return; }
     if (g > PASS_REACH) {
-      rl.lockT = 0.45; c.v *= 0.4; rl.drops++;
+      rl.lockT = 0.3; c.v *= 0.6; rl.drops++;
       c.el.classList.remove("drop"); void c.el.offsetWidth; c.el.classList.add("drop");
       buzz([30, 40, 30]); tick(0.5);
       relayPop("<small>MISS</small><strong>とどかない！</strong><em>もっと近づいてからシュッ！</em>", "warn");
@@ -2224,7 +2238,8 @@
     var sw = document.getElementById("relaySwipe");
     sw.classList.toggle("on", rl.canPass && !rl.finished); sw.classList.toggle("big", rl.canPass && !rl.tutDone);
     var tut = rl.started && rl.leg === 0 && rl.steps < 10, nextFoot = rl.foot === "L" ? "R" : "L";
-    Array.prototype.forEach.call(document.querySelectorAll(".foot"), function(f){ f.classList.toggle("hint", tut && f.getAttribute("data-foot") === nextFoot); });
+    if (!relayRender.feet) relayRender.feet = Array.prototype.slice.call(document.querySelectorAll(".foot"));
+    relayRender.feet.forEach(function(f){ f.classList.toggle("hint", tut && f.getAttribute("data-foot") === nextFoot); });
   }
 
   function relayGoal(){
@@ -2273,6 +2288,7 @@
     if (m) { later(function(){ tick(0.6); buzz([20, 40, 60]); }, 650); }
     document.getElementById("relayEnd").onclick = function(){ closeRelay(); var ev = EVENTS.filter(function(x){ return x.relay; })[0]; renderCard(ev); goTo(ev.id); };
     document.getElementById("relayAgain").onclick = function(){ openRelay(); };
+    prepareRelayCard(res);
     document.getElementById("relayShare").onclick = function(){ shareRelay(res, this); };
   }
 
@@ -2337,26 +2353,32 @@
     x.fillText("なぞときウォークラリー ANIMAL SPORTS FESTIVAL in 東山動植物園", W / 2, H - M - bh - 30);
     return cv;
   }
-  function shareRelay(res, btn){
-    btn.disabled = true; btn.textContent = "作成中…";
-    var nick = state.nick || "";
-    loadCertFonts(nick + "バトンをつなげ獲得完走勝利あと秒伝説のアンカー金銀銅メダル").then(function(){
+  var relayCardFile = null, relayCardUrl = null;
+  function prepareRelayCard(res){
+    relayCardFile = null;
+    loadCertFonts((state.nick || "") + "バトンをつなげ獲得完走勝利あと秒伝説のアンカー金銀銅メダル").then(function(){
       return new Promise(function(r){ drawRelayCard(res).toBlob(function(b){ r(b); }, "image/png"); });
     }).then(function(blob){
-      btn.disabled = false; btn.textContent = "記録をシェアする";
       if (!blob) return;
-      var url = URL.createObjectURL(blob), box = document.getElementById("relayCard");
-      document.getElementById("relayCardImg").src = url; box.hidden = false;
-      var text = "RELAY「バトンをつなげ！」" + (res.medal ? res.medal.name + "獲得！" : "完走！") + " タイム " + res.time.toFixed(1) + "秒（ナイスバトン " + res.perfect + "/" + (LEGS - 1) + "）";
-      var file = null; try { file = new File([blob], "ASF_relay.png", { type:"image/png" }); } catch(e){}
-      if (file && navigator.canShare && navigator.canShare({ files:[file] })) {
-        navigator.share({ files:[file], text:text }).then(function(){ track("relay_share", { medal: res.medal ? res.medal.id : "none" }); }).catch(function(){});
-      } else if (navigator.share) {
-        navigator.share({ text:text }).then(function(){ track("relay_share", { medal: res.medal ? res.medal.id : "none" }); }).catch(function(){});
-      }
-      setTimeout(function(){ box.scrollIntoView({ behavior:"smooth", block:"center" }); }, 120);
-    }).catch(function(){ btn.disabled = false; btn.textContent = "記録をシェアする"; });
+      if (relayCardUrl) URL.revokeObjectURL(relayCardUrl);
+      relayCardUrl = URL.createObjectURL(blob);
+      try { relayCardFile = new File([blob], "ASF_relay.png", { type:"image/png" }); } catch(e){ relayCardFile = blob; }
+      var img = document.getElementById("relayCardImg"); if (img) img.src = relayCardUrl;
+    }).catch(function(){});
   }
+  function shareRelay(res, btn){
+    // iPhone は「タップした瞬間」に共有を呼ぶ必要があるので、画像は結果表示のときに作っておく
+    if (!relayCardUrl) { btn.textContent = "作成中…もう一度押してね"; setTimeout(function(){ btn.textContent = "記録をシェアする"; }, 1500); return; }
+    var box = document.getElementById("relayCard"); box.hidden = false;
+    var text = "RELAY「バトンをつなげ！」" + (res.medal ? res.medal.name + "獲得！" : "完走！") + " タイム " + res.time.toFixed(1) + "秒（ナイスバトン " + res.perfect + "/" + (LEGS - 1) + "）";
+    var file = relayCardFile, done = function(){ track("relay_share", { medal: res.medal ? res.medal.id : "none" }); };
+    try {
+      if (file && navigator.canShare && navigator.canShare({ files:[file] })) navigator.share({ files:[file], text:text }).then(done).catch(function(){});
+      else if (navigator.share) navigator.share({ text:text }).then(done).catch(function(){});
+    } catch(e){}
+    setTimeout(function(){ box.scrollIntoView({ behavior:"smooth", block:"center" }); }, 120);
+  }
+
 
   if (/[?&]debug=1/.test(location.search)) window.__relay = { get:function(){ return rl; }, foot:relayFoot, pass:relayPass, LEG:LEG, ZONE:ZONE };
   (function(){
@@ -2373,7 +2395,7 @@
     function move(e){
       var p = pts[e.pointerId]; if (!p || p.fired) return;
       var dy = p.y - e.clientY, dx = Math.abs(e.clientX - p.x);
-      if (dy > 34 && dy > dx * 1.1 && performance.now() - p.t < 600) { p.fired = true; relayPass(); }
+      if (dy > 42 && dy > dx * 1.3 && performance.now() - p.t < 500) { p.fired = true; relayPass(); }
     }
     function up(e){ delete pts[e.pointerId]; }
     [st, feet].forEach(function(el){
@@ -2382,11 +2404,18 @@
     });
     // パソコンで確認するとき：← → で足、↑ / スペースでバトンパス
     document.addEventListener("keydown", function(e){
-      if (!rl || relayEl.hidden) return;
+      if (!rl || relayEl.hidden || rl.finished) return;
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); if (!e.repeat) relayFoot(e.key === "ArrowLeft" ? "L" : "R"); }
       else if (e.key === "ArrowUp" || e.key === " ") { e.preventDefault(); relayPass(); }
     });
     document.getElementById("relayClose").addEventListener("click", closeRelay);
+    // iPhone：ピンチ・ダブルタップ拡大を止める（ボタンと結果画面のスクロールはそのまま）
+    function guard(e){ if (relayEl.hidden) return; var t = e.target; if (t.closest && (t.closest(".relay-done") || t.closest("#relayClose"))) return; if (e.cancelable) e.preventDefault(); }
+    relayEl.addEventListener("touchstart", function(e){ if (e.touches.length > 1) guard(e); }, { passive:false });
+    relayEl.addEventListener("touchmove", guard, { passive:false });
+    relayEl.addEventListener("touchend", guard, { passive:false });
+    relayEl.addEventListener("dblclick", function(e){ e.preventDefault(); });
+    ["gesturestart", "gesturechange", "gestureend"].forEach(function(n){ document.addEventListener(n, function(e){ if (!relayEl.hidden) e.preventDefault(); }, { passive:false }); });
     document.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest("[data-relay]"); if (b) openRelay(); });
   })();
 
