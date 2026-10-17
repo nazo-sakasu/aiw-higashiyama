@@ -117,6 +117,34 @@
 
   main{ padding-block:28px 32px; display:flex; flex-direction:column; gap:28px; }
 
+  /* ---------- 開幕前（11/1 9:00まで）：記録カード以降を隠す ---------- */
+  body.pre-open #cards, body.pre-open #cardList, body.pre-open #final, body.pre-open .info, body.pre-open .navbar{ display:none !important; }
+  .soon{
+    position:relative; overflow:hidden; text-align:center; color:var(--surface); background:var(--ink);
+    border-radius:8px; border:3px solid var(--ink); box-shadow:0 0 0 3px var(--surface); padding:22px 16px 20px;
+  }
+  .soon::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background:repeating-linear-gradient(-45deg, transparent 0 14px, rgba(255,252,244,.035) 14px 28px); }
+  .soon > *{ position:relative; }
+  .soon-kicker{ margin:0; font:800 .72rem/1 var(--font-latin); letter-spacing:.3em; color:var(--yellow); }
+  .soon h2{ margin:10px 0 0; font-size:1.12rem; font-weight:900; line-height:1.5; }
+  .soon h2 .p{ display:inline-block; }
+  .soon h2 b{ color:var(--yellow); }
+  .soon-cd{ display:flex; justify-content:center; gap:6px; margin:16px 0 4px; font-variant-numeric:tabular-nums; }
+  .soon-cd div{ min-width:58px; padding:8px 4px 6px; border-radius:8px; background:#2C2722; border:1.5px solid #423B33; }
+  .soon-cd b{ display:block; font:800 1.9rem/1 var(--font-latin); color:#fff; }
+  .soon-cd small{ display:block; margin-top:4px; font:700 .58rem/1 var(--font-latin); letter-spacing:.18em; color:#A29C92; }
+  .soon-lanes{ display:flex; gap:5px; margin:16px 0 0; }
+  .soon-lanes span{ flex:1; min-width:0; padding:8px 2px 7px; border-radius:6px; background:rgba(255,252,244,.06); font:700 .6rem/1 var(--font-latin); letter-spacing:.06em; color:#8F897F; white-space:nowrap; }
+  .soon-lanes i{ display:block; height:10px; margin:0 6px 7px; border-radius:999px; background:var(--c); opacity:.35; }
+  .soon-lanes span::before{ content:""; display:block; width:12px; height:12px; margin:0 auto 6px; opacity:.7;
+    background:currentColor; -webkit-mask:var(--lock) center/contain no-repeat; mask:var(--lock) center/contain no-repeat; }
+  .soon-note{ margin:14px 0 0; font-size:.78rem; font-weight:700; line-height:1.7; color:#E6E0D6; }
+  .soon-note .p{ display:inline-block; }
+  .soon-note small{ display:block; font-size:.7rem; color:#A29C92; }
+  .soon.open{ animation:soonOut .6s ease both; }
+  @keyframes soonOut{ to{ opacity:0; transform:scale(.96); } }
+
   /* ---------- スコアボード ---------- */
   .board{
     background:var(--ink); color:var(--surface); border-radius:8px; padding:16px 16px 18px;
@@ -939,6 +967,7 @@
 
 <main class="wrap gutter">
   <section class="today" id="today" hidden aria-live="polite"></section>
+  <section class="soon" id="soon" hidden aria-labelledby="soonTitle"></section>
 
   <section class="board" id="cards" aria-labelledby="boardTitle">
     <div class="board-head">
@@ -1095,7 +1124,8 @@
     holidays:["2026-11-03","2026-11-23"]
   };
   var CERT_NICK_MAX = 12;
-  // 開始前ロック：true にすると OPEN_AT（日本時間）まで答えを入力できない。URL末尾に ?unlock=1 を付けるとロック中でもテストできる
+  // 開始前ロック：true にすると OPEN_AT（日本時間）まで「開幕まで…」の枠より下（記録カード以降）を隠し、カウントダウンを表示する
+  // URL末尾に ?unlock=1 を付けるとロック中でもテストできる／?curtain=1 でロック前でも隠した状態を確認できる
   var LOCK_BEFORE_OPEN = false;   // ★ 最後に true にする
   var OPEN_AT = "2026-11-01T09:00:00+09:00";   // 完走証のニックネーム最大文字数
 
@@ -1374,6 +1404,45 @@
     if (ev.stampImg) return "";
     return '<div class="seal' + (animate ? " press" : "") + '" aria-hidden="true"><span><em>' + esc(ev.word) + '</em><strong>CLEAR</strong></span></div>';
   }
+  /* ---- 開幕前の目隠し：OPEN_AT まで記録カード以降を隠してカウントダウン ---- */
+  function curtainOn(){
+    if (/[?&]curtain=1/.test(location.search)) return true;
+    return isLocked();
+  }
+  function initCurtain(){
+    if (!curtainOn()) return;
+    var el = document.getElementById("soon"), open = Date.parse(OPEN_AT);
+    var lock = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="12" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#000" stroke-width="2.6"/></svg>') + '")';
+    el.style.setProperty("--lock", lock);
+    el.innerHTML =
+      '<p class="soon-kicker">COMING SOON</p>' +
+      '<h2 id="soonTitle"><span class="p">記録カードは</span><span class="p"><b>11月1日（日）9:00</b>に</span><span class="p">オープン！</span></h2>' +
+      '<div class="soon-cd" aria-live="off"><div><b data-k="d">0</b><small>DAYS</small></div><div><b data-k="h">00</b><small>HOURS</small></div><div><b data-k="m">00</b><small>MIN</small></div><div><b data-k="s">00</b><small>SEC</small></div></div>' +
+      '<div class="soon-lanes" aria-hidden="true">' + EVENTS.filter(function(e){ return !e.bonusOf; }).map(function(e){
+        return '<span style="--c:' + THEME[e.color].c + '"><i></i>' + esc(e.word) + "</span>";
+      }).join("") + "</div>" +
+      '<p class="soon-note"><span class="p">当日は、キットを手もとに</span><span class="p">このページを開いてね！</span>' +
+      "<small>※ ページを開いたまま9:00になると、自動ではじまります。</small></p>";
+    el.hidden = false;
+    document.body.classList.add("pre-open");
+    var cells = {}; Array.prototype.forEach.call(el.querySelectorAll("[data-k]"), function(b){ cells[b.getAttribute("data-k")] = b; });
+    function p2(n){ return ("0" + n).slice(-2); }
+    function tickCd(){
+      var left = Math.max(0, open - Date.now()), sec = Math.floor(left / 1000);
+      cells.d.textContent = Math.floor(sec / 86400); cells.h.textContent = p2(Math.floor(sec % 86400 / 3600));
+      cells.m.textContent = p2(Math.floor(sec % 3600 / 60)); cells.s.textContent = p2(sec % 60);
+      if (left <= 0 && !/[?&]curtain=1/.test(location.search)) {
+        clearInterval(iv);
+        el.classList.add("open");
+        setTimeout(function(){
+          el.hidden = true; document.body.classList.remove("pre-open");
+          renderToday(); renderAll(); toast("スタート！ 記録カードがオープンしました。");
+          track("curtain_open", {});
+        }, 600);
+      }
+    }
+    var iv = setInterval(tickCd, 1000); tickCd();
+  }
   function isLocked(){
     if (!LOCK_BEFORE_OPEN || /[?&]unlock=1/.test(location.search)) return false;
     return Date.now() < Date.parse(OPEN_AT);
@@ -1574,6 +1643,8 @@
       var next = null;
       for (var k = tn + 1; k <= en; k++) { if (!isClosed(fromNum(k))) { next = fromNum(k); break; } }
       sub = "東山動植物園はお休みです。\n" + (next ? "次の開園日：" + jpDate(next) : "イベントは本日で終了です");
+    } else if (tn === sn && Date.now() < Date.parse(OPEN_AT)) {
+      st = "before"; msg = "<em>本日9:00</em> スタート！"; sub = "いよいよ開幕！ キットを準備して待っててね";
     } else {
       st = "open"; msg = "<em>開催中！</em>本日は開園日です";
       var lastOpen = null;
@@ -2870,6 +2941,7 @@
   startedAt();
   renderToday();
   renderAll();
+  initCurtain();
   if (isLocked()) {   // ページを開いたまま9:00を迎えたら自動で入力欄を表示
     var wait = Date.parse(OPEN_AT) - Date.now() + 500;
     if (wait < 86400000) setTimeout(function(){ renderAll(); toast("スタート！ 答えを入力できるようになりました。"); }, wait);
