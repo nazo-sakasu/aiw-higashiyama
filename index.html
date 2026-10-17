@@ -1169,7 +1169,7 @@
   // blanks：答えを複数入力させる場合（順番はどちらでもOK）
   var EVENTS = [
     { id:1, no:"01", word:"THROW", kana:"なげる", color:"red",
-      text:"一番遠くまで飛んだのはだれ？",
+      text:"一番遠くまで投げたのはだれ？",
       answers:["アイ"], img:"", stampImg:"",
       fact:{ emoji:"🦍", img:"gorilla", title:"ゴリラの怪力のひみつ！",
         body:["ゴリラは、太くて長い腕と発達した筋肉を持つ力持ち！",
@@ -1191,7 +1191,7 @@
       reveal:{ img:"tower", kicker:"じつは…", lead:"導き出した答えの「134m」は", title:["東山スカイタワー","の高さ！"], value:134, unit:"m",
         body:"地上100mの展望室からは、名古屋の街を一望できるよ。カンガルーの世界記録の約10倍の高さ！" } },
     { id:3, no:"03", word:"RUN", kana:"はしる", color:"green",
-      text:"1位の動物は誰？",
+      text:"1位になったのはだれ？",
       answers:["バイソン"], img:"", stampImg:"",
       fact:{ emoji:"🦬", img:"bison", title:"アメリカバイソンの身体能力のひみつ！",
         body:["アメリカバイソンは、体重が1トン近くにもなる巨体なのに、最高時速約55kmで走ることができるんだ！",
@@ -2156,7 +2156,7 @@
   function relayCardHtml(){
     var koala = '<img src="' + ART.koala + '" alt="">';
     if (!state.relayDone) {
-      return '<div class="relay-box"><p>12頭の選手がバトンをつなぐリレーに出走！ ゴールして、リレーオーダー表を完成させよう！</p>' +
+      return '<div class="relay-box"><p>12名の選手がバトンをつなぐリレーに出走！ ゴールして、リレーオーダー表を完成させよう！</p>' +
              '<button type="button" class="relay-open" data-relay="1">' + koala + 'リレーに出走する</button></div>';
     }
     return '<div class="relay-box"><p class="relay-ttl">🏃 リレーオーダー表</p>' + orderHtml() +
