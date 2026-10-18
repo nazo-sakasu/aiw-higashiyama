@@ -322,6 +322,13 @@
   }
   .go[aria-disabled="true"]{ opacity:.5; pointer-events:none; }
   .clear-msg{ margin:0; font-size:1.3rem; font-weight:900; }
+  .story{ display:flex; flex-direction:column; gap:10px; }
+  .story .p, .clear-msg .p{ display:inline-block; }
+  .story .st{ margin:0; font-size:.98rem; font-weight:800; line-height:1.75; }
+  .story .ann{ position:relative; display:flex; gap:8px; align-items:flex-start; margin:4px 0; padding:10px 12px 11px; border-radius:10px; background:var(--ink); color:#fff; font-size:.9rem; font-weight:800; line-height:1.6; box-shadow:0 3px 0 var(--red); }
+  .story .ann > span:first-child{ flex:none; font-size:1.15rem; line-height:1.3; animation:annShake 1.4s ease-in-out infinite; transform-origin:30% 70%; }
+  @keyframes annShake{ 0%, 70%, 100%{ transform:none; } 76%{ transform:rotate(-14deg) scale(1.12); } 84%{ transform:rotate(10deg) scale(1.12); } 92%{ transform:rotate(-6deg); } }
+  .story .q{ margin:6px 0 0; padding-top:12px; border-top:2px dashed rgba(31,27,22,.25); }
 
   /* ---------- info ---------- */
   .info{ display:flex; flex-direction:column; gap:14px; }
@@ -1301,10 +1308,18 @@
 
   // 最終問題（すべてのスタンプを集めると現れる）
   var FINAL = {
-    text:"（最終問題の問題文）",
+    // 問題文：1行＝1段落。「📢」で始まる行はアナウンス風、最後の行は問題（大きく表示）
+    // 「|」は改行してよい位置（言葉の途中で折り返さないように）
+    text:[
+      "全種目、おつかれさま！|これにて|ANIMAL SPORTS FESTIVAL の|全競技が終了！",
+      "……と思ったら、たいへん！|表彰式の準備が|まだできていないぞ！",
+      "📢 大会本部よりお知らせです。|まもなく表彰式が|はじまります。",
+      "急がないと！|このあとの表彰式に|間に合うように、|みんなの力で|表彰台をつくろう！",
+      "表彰台が完成したとき、|あらわれる言葉は？"
+    ],
     img:"",                 // 最終問題の画像（任意）
     answers:["最終","さいしゅう"],   // ★ デモ用の仮の答え（「最終」で正解）。本番の答えが決まったら差し替える
-    clearText:"おみごと！ 全種目、完全制覇！"
+    clearText:"表彰台、完成！|優勝（1位）は……|ここまで走りきった|みんなだ！"
   };
   /* ======================================= */
 
@@ -1657,7 +1672,7 @@
       if (showFact && ev.reveal) html += revealHtml(ev);
       if (opts.unlocked) html += '<p class="unlock-note">…あれ？ RUNの種目がもう1つ現れた！</p>' +
                                  '<button type="button" class="next-btn" data-goto="' + opts.unlocked + '">現れた種目へ進む ▶</button>';
-      if (opts.allClear) html += '<button type="button" class="to-ceremony" data-ceremony="1"><span aria-hidden="true">🏅</span>全種目クリア！ 表彰式へ</button>';
+      if (opts.allClear) html += '<button type="button" class="to-ceremony" data-ceremony="1"><span aria-hidden="true">🏅</span>全種目クリア！ メダルGET</button>';
     } else {
       if (ev.relay) html += relayCardHtml();
       html += formHtml(ev) + '<p class="fb" id="fb-' + ev.id + '" role="status" aria-live="polite"></p>';
@@ -1694,18 +1709,27 @@
   /* ---- 最終問題 ---- */
   var finalEl = document.getElementById("final");
   var finalTries = 0, timer = null;
+  function phr(t){ return String(t).split("|").map(function(x){ return '<span class="p">' + esc(x) + "</span>"; }).join(""); }
+  function finalTextHtml(){
+    var t = [].concat(FINAL.text || []), last = t.length - 1;
+    return '<div class="story">' + t.map(function(line, i){
+      line = String(line);
+      if (/^📢/.test(line)) return '<p class="ann"><span aria-hidden="true">📢</span><span>' + phr(line.replace(/^📢\s*/, "")) + "</span></p>";
+      return '<p class="' + (i === last ? "q" : "st") + '">' + phr(line) + "</p>";
+    }).join("") + "</div>";
+  }
   function renderFinal(opts){
     opts = opts || {};
     finalEl.hidden = !allStamps();
     if (finalEl.hidden) return;
     var html =
-      '<div class="final-top"><button type="button" class="medal" data-ceremony="2" aria-label="表彰式をもう一度見る">1st</button>' +
+      '<div class="final-top"><button type="button" class="medal" data-ceremony="2" aria-label="メダルをもう一度見る">1st</button>' +
         '<p class="kicker">全種目クリア！</p><h2>FINAL</h2></div>' +
       '<div class="body">';
     if (FINAL.img) html += '<img class="final-img" src="' + esc(FINAL.img) + '" alt="">';
-    html += '<p class="q">' + esc(FINAL.text) + '</p>';
+    html += finalTextHtml();
     if (state.final) {
-      html += '<p class="clear-msg">' + esc(FINAL.clearText) + '</p>' +
+      html += '<p class="clear-msg">' + phr(FINAL.clearText) + '</p>' +
               '<p class="countdown" id="countdown">アンケートに回答すると、後日の抽選に参加できます。</p>' +
               '<a class="go" id="surveyBtn" href="' + esc(SURVEY_URL || "#") + '"' + (SURVEY_URL ? "" : ' aria-disabled="true"') + '>アンケートに回答する（後日抽選）</a>' +
               certHtml();
