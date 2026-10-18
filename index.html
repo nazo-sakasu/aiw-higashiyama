@@ -258,7 +258,7 @@
   .locked{ margin:0; padding:12px 14px; border-radius:8px; border:2px dashed var(--ink); background:var(--paper); font-size:.86rem; font-weight:700; color:var(--muted); text-align:center; }
   .locked b{ display:block; color:var(--ink); font-size:.96rem; font-weight:900; margin-bottom:2px; }
   .q-sub{ margin:6px 0 0; color:var(--red); font-size:.86rem; font-weight:800; line-height:1.5; }
-  dd .nw{ display:inline-block; }
+  dd .nw, .hint .nw, .relay-box .nw{ display:inline-block; }
   .ans{ display:flex; gap:8px; }
   .ans.multi{ flex-direction:column; gap:10px; }
   .field{ display:flex; flex-direction:column; gap:4px; }
@@ -736,6 +736,41 @@
   .foot.hint.hit{ animation:footHit .16s ease-out; }
 
   /* 結果 */
+  /* ---------- シークレットモードの注意 ---------- */
+  .pvt{ position:fixed; left:10px; right:10px; top:calc(10px + env(safe-area-inset-top, 0px)); z-index:17; display:flex; align-items:flex-start; gap:8px;
+    max-width:520px; margin:0 auto; padding:11px 10px 11px 14px; border-radius:12px; background:var(--red); color:#fff; border:3px solid var(--ink); box-shadow:0 5px 0 var(--ink); animation:pvtIn .5s cubic-bezier(.2,1.3,.4,1) both; }
+  .pvt p{ flex:1; margin:0; font-size:.86rem; font-weight:800; line-height:1.55; }
+  .pvt b{ display:block; font-size:.95rem; font-weight:900; }
+  .pvt .nw{ display:inline-block; }
+  .pvt small{ display:block; margin-top:4px; font-size:.72rem; font-weight:700; opacity:.92; }
+  .pvt button{ flex:none; width:30px; height:30px; border-radius:50%; border:2px solid #fff; background:transparent; color:#fff; font-size:1.05rem; line-height:1; cursor:pointer; }
+  @keyframes pvtIn{ from{ transform:translateY(-130%); } to{ transform:none; } }
+
+  /* ---------- ときどき画面の下を動物が走り抜ける ---------- */
+  .parade{ position:fixed; inset:0; z-index:6; pointer-events:none; overflow:hidden; }
+  .parade .pr{ position:absolute; left:0; top:0; width:max-content; will-change:transform; }
+  .parade .pr .tl{ display:block; transform-origin:50% 90%; }
+  .parade .pr img{ display:block; height:var(--h, 44px); width:auto; max-width:none;
+    filter:drop-shadow(1.4px 0 0 #fff) drop-shadow(-1.4px 0 0 #fff) drop-shadow(0 1.4px 0 #fff) drop-shadow(0 -1.4px 0 #fff) drop-shadow(0 3px 2px rgba(0,0,0,.3)); }
+  .parade .pr .f{ display:block; }
+  .parade .pr.flip .f{ transform:scaleX(-1); }
+  .parade .pr i{ position:absolute; left:50%; bottom:-3px; width:60%; height:6px; margin-left:-30%; border-radius:50%; background:rgba(0,0,0,.18); }
+  .parade .bob{ animation:prBob .34s ease-in-out infinite alternate; }
+  .parade .hop{ animation:prHop .5s cubic-bezier(.3,0,.7,1) infinite; }
+  .parade .waddle{ animation:prWad .3s ease-in-out infinite alternate; transform-origin:50% 100%; }
+  .parade .heavy{ animation:prBob .46s ease-in-out infinite alternate; }
+  @keyframes prBob{ from{ transform:translateY(0); } to{ transform:translateY(-4px); } }
+  @keyframes prHop{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-16px); } }
+  @keyframes prWad{ from{ transform:rotate(-8deg); } to{ transform:rotate(8deg); } }
+  @media (prefers-reduced-motion:reduce){ .parade{ display:none; } }
+  .relay-rot{ display:none; }
+  @media (orientation:landscape) and (max-height:520px){
+    .relay-rot{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; position:absolute; inset:0; z-index:40; background:#13110E; color:#fff; text-align:center; }
+    .relay-rot span{ font-size:2.6rem; display:inline-block; transform:rotate(-90deg); animation:rotHint 1.6s ease-in-out infinite; }
+    .relay-rot b{ font-size:1.1rem; font-weight:900; }
+    .relay-rot small{ font-size:.8rem; color:#A29C92; font-weight:700; }
+  }
+  @keyframes rotHint{ 0%,30%{ transform:rotate(-90deg); } 60%,100%{ transform:rotate(0); } }
   .relay-rec{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .relay-rec > div{ padding:10px 8px; border-radius:10px; background:#24201C; border:1.5px solid #3A342D; text-align:center; }
   .relay-rec small{ display:block; font:800 .58rem/1 var(--font-latin); letter-spacing:.2em; color:var(--yellow); }
@@ -996,8 +1031,8 @@
       <div class="panel-body notes" id="notesBody"></div>
     </details>
     <section class="panel hint" id="hint">
-      <p>解き方が分からないときは、アイシン労働組合公式LINEでヒントをお届けします。</p>
-      <a id="hintBtn" href="#" target="_blank" rel="noopener">アイシン労働組合公式LINEでヒントを見る</a>
+      <p><span class="nw">解き方が分からないときは、</span><span class="nw">アイシン労働組合公式LINEで</span><span class="nw">ヒントをお届けします。</span></p>
+      <a id="hintBtn" href="#" target="_blank" rel="noopener"><span class="nw">アイシン労働組合公式LINEで</span><span class="nw">ヒントを見る</span></a>
     </section>
   </div>
 </main>
@@ -1023,7 +1058,13 @@
   </div>
 </nav>
 
+<div class="pvt" id="pvt" role="alert" hidden>
+  <p><b>⚠ このままだと記録が保存されません。</b><span class="nw">シークレットモードをやめて</span><span class="nw">開き直してね</span>
+  <small><span class="nw">シークレットモード（プライベートブラウズ）では、</span><span class="nw">ページを閉じると</span><span class="nw">記録カードが消えてしまいます。</span></small></p>
+  <button type="button" id="pvtX" aria-label="閉じる">×</button>
+</div>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="parade" id="parade" aria-hidden="true"></div>
 
 <div class="relay" id="relay" hidden role="dialog" aria-modal="true" aria-labelledby="relayTitle">
   <div class="relay-head">
@@ -1044,6 +1085,7 @@
     <div class="relay-done" id="relayDone" hidden></div>
   </div>
   <div class="relay-meter" aria-hidden="true"><small>SPEED</small><i><b id="relaySpeed"></b></i></div>
+  <div class="relay-rot" aria-live="polite"><span aria-hidden="true">📱</span><b>スマホを縦向きにしてね</b><small>縦向きにもどすと、つづきから再開します</small></div>
   <div class="relay-feet" id="relayFeet">
     <button type="button" class="foot" data-foot="L" aria-label="左足"><small>L</small></button>
     <button type="button" class="foot" data-foot="R" aria-label="右足"><small>R</small></button>
@@ -1101,6 +1143,7 @@
     window.gtag("js", new Date());
     window.gtag("config", GA_ID);
   }
+  function ansText(v){ return String(v == null ? "" : v).replace(/\s+/g, " ").trim().slice(0, 30); }   // 誤答の中身（GA4用・30文字まで）
   function track(name, params){ try { if (window.gtag) window.gtag("event", name, params || {}); } catch(e){} }
   initGA();
 
@@ -1127,7 +1170,7 @@
   // 開始前ロック：true にすると OPEN_AT（日本時間）まで「開幕まで…」の枠より下（記録カード以降）を隠し、カウントダウンを表示する
   // URL末尾に ?unlock=1 を付けるとロック中でもテストできる／?curtain=1 でロック前でも隠した状態を確認できる
   var LOCK_BEFORE_OPEN = false;   // ★ 最後に true にする
-  var OPEN_AT = "2026-11-01T09:00:00+09:00";   // 完走証のニックネーム最大文字数
+  var OPEN_AT = "2026-11-01T09:00:00+09:00";   // 開幕日時（日本時間）
 
   var ABOUT = [
     { label:"開催期間", value:["2026年11月1日（日）〜","11月30日（月）"], note:"※お出かけ前に、東山動植物園の休園日をご確認ください。" },
@@ -1404,6 +1447,101 @@
     if (ev.stampImg) return "";
     return '<div class="seal' + (animate ? " press" : "") + '" aria-hidden="true"><span><em>' + esc(ev.word) + '</em><strong>CLEAR</strong></span></div>';
   }
+  /* ---- シークレットモード（プライベートブラウズ）を見つけたら注意を出す ---- */
+  // 完全には見分けられないため、確実に分かるものだけで判定（URL末尾 ?private=1 で表示確認）
+  function checkPrivate(){
+    var shown = false;
+    function show(why){
+      if (shown) return; shown = true;
+      var el = document.getElementById("pvt"); el.hidden = false;
+      document.getElementById("pvtX").onclick = function(){ el.hidden = true; };
+      track("private_mode", { how: why });
+    }
+    if (/[?&]private=1/.test(location.search)) return show("preview");
+    try { localStorage.setItem("__t", "1"); if (localStorage.getItem("__t") !== "1") throw 0; localStorage.removeItem("__t"); }
+    catch(e){ return show("storage"); }
+    var ua = navigator.userAgent || "";
+    var isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|EdgiOS|Android/.test(ua) || /iPhone|iPad/.test(ua) && /AppleWebKit/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+    try {
+      if (isSafari && navigator.storage && navigator.storage.getDirectory) {          // Safari 17以降
+        navigator.storage.getDirectory().then(function(){}, function(e){ if (String(e && e.message).indexOf("unknown transient reason") >= 0) show("safari"); });
+      } else if (isSafari && window.indexedDB) {                                        // Safari 16以前
+        var nm = "__pv" + Date.now(), rq = indexedDB.open(nm, 1);
+        rq.onupgradeneeded = function(ev){
+          var db = ev.target.result;
+          try { db.createObjectStore("t", { autoIncrement:true }).put(new Blob()); } catch(err){ if (/BlobURLs|not yet supported/i.test(String(err && err.message))) show("safari_old"); }
+          finally { try { db.close(); indexedDB.deleteDatabase(nm); } catch(_){} }
+        };
+      } else if (navigator.webkitTemporaryStorage && navigator.webkitTemporaryStorage.queryUsageAndQuota) {   // Chrome・Edge（Android含む）
+        navigator.webkitTemporaryStorage.queryUsageAndQuota(function(u, q){
+          var heap = (window.performance && performance.memory && performance.memory.jsHeapSizeLimit) || 1073741824;
+          if (q < heap * 2) show("chrome");
+        }, function(){});
+      } else if (/Firefox/.test(ua) && !navigator.serviceWorker) {
+        show("firefox");
+      }
+    } catch(e){}
+  }
+
+  /* ---- ときどき動物が画面のあちこちを走り抜ける（縦横無尽）。ラビオンは出さない ---- */
+  function initParade(){
+    var layer = document.getElementById("parade");
+    if (!layer || reduceMotion()) return;
+    var cast = RELAY_RUNNERS.filter(function(r){ return r.img && r.name !== "ラビオン"; })
+      .map(function(r){ return { img:r.img, style:r.style || "run" }; });
+    if (RIVAL.img) cast.push({ img:RIVAL.img, style:"run" });
+    cast.push({ img:ART.koala, style:"run", right:true, h:50 });   // コアラの絵だけ右向き
+    var bag = [], busy = false;
+    function pick(){ if (!bag.length) bag = cast.slice().sort(function(){ return Math.random() - .5; }); return bag.pop(); }
+    function rnd(a, b){ return a + Math.random() * (b - a); }
+    function blocked(){
+      if (document.hidden || busy) return true;
+      if (!relayEl.hidden || !calcEl.hidden || !cer.hidden) return true;          // 全画面を開いているとき
+      var a = document.activeElement; if (a && a.tagName === "INPUT") return true;  // 入力中（キーボード表示中）
+      return false;
+    }
+    // コース（画面の外→外）。W,H は画面サイズ、m は画面外の余白
+    function course(W, H){
+      var m = 90, top = H * .12, bot = H * .86, t = Math.random(), dir = Math.random() < .5 ? -1 : 1;
+      var xa = dir < 0 ? W + m : -m, xb = dir < 0 ? -m : W + m, y;
+      if (t < .28) { y = rnd(top, bot); return [[xa, y], [xb, y + rnd(-60, 60)]]; }                                   // まっすぐ横切る
+      if (t < .5)  { var y1 = rnd(top, H * .4), y2 = rnd(H * .6, bot); if (Math.random() < .5) { var q = y1; y1 = y2; y2 = q; } return [[xa, y1], [xb, y2]]; }   // ななめに横切る
+      if (t < .68) { y = rnd(top, bot); var amp = rnd(50, 90);                                                       // ジグザグ
+        return [[xa, y], [W * (dir < 0 ? .7 : .3), y - amp], [W * .5, y + amp], [W * (dir < 0 ? .3 : .7), y - amp], [xb, y]]; }
+      if (t < .84) { var sx = rnd(W * .25, W * .75); return Math.random() < .5 ? [[sx, H + m], [sx + dir * rnd(40, 140), -m]] : [[sx, -m], [sx + dir * rnd(40, 140), H + m]]; }   // たてに駆け抜ける
+      var ya = rnd(H * .55, bot); return [[xa, ya], [W * .5, ya - rnd(H * .25, H * .4)], [xb, ya]];             // 大ジャンプで弧をえがく
+    }
+    function run(){
+      if (blocked()) return later2(4000);
+      busy = true;
+      var W = window.innerWidth, H = window.innerHeight, path = course(W, H);
+      var len = 0; for (var k = 1; k < path.length; k++) len += Math.hypot(path[k][0] - path[k-1][0], path[k][1] - path[k-1][1]);
+      var dur = len / rnd(150, 210) * 1000;
+      var n = Math.random() < .22 ? 2 + (Math.random() < .35 ? 1 : 0) : 1;     // ときどき2〜3頭がつづけて
+      var done = 0;
+      var dx = path[path.length - 1][0] - path[0][0], movingRight = dx > 0 || (dx === 0 && Math.random() < .5);
+      for (var i = 0; i < n; i++) (function(c, k){
+        var el = document.createElement("div");
+        var flip = c.right ? !movingRight : movingRight;     // 絵の向きを進む方向に合わせる
+        el.className = "pr" + (flip ? " flip" : "");
+        var mv = c.style === "run" ? "bob" : c.style, h = c.h || 44;
+        el.innerHTML = '<i></i><span class="tl"><span class="f"><img src="' + c.img + '" alt="" class="' + mv + '" style="--h:' + h + 'px;animation-delay:-' + (Math.random() * .4).toFixed(2) + 's"></span></span>';
+        layer.appendChild(el);
+        var w = h * 1.5, frames = path.map(function(pt, j){
+          var nx = path[Math.min(j + 1, path.length - 1)], pv = path[Math.max(j - 1, 0)];
+          var ang = Math.atan2(nx[1] - pv[1], Math.abs(nx[0] - pv[0]) + 1) * 180 / Math.PI;   // 坂道っぽく少し傾ける
+          ang = Math.max(-22, Math.min(22, ang)) * (movingRight ? 1 : -1);
+          return { transform:"translate(" + (pt[0] - w / 2) + "px," + (pt[1] - h) + "px) rotate(" + ang.toFixed(1) + "deg)" };
+        });
+        var an = el.animate(frames, { duration: dur, delay: k * 300, easing:"linear", fill:"both" });
+        an.onfinish = function(){ el.remove(); if (++done === n) { busy = false; later2(); } };
+      })(pick(), i);
+    }
+    function later2(ms){ setTimeout(run, ms || rnd(9000, 20000)); }
+    later2(rnd(4000, 7000));
+    if (/[?&]debug=1/.test(location.search)) window.__parade = function(){ busy = false; run(); };
+  }
+
   /* ---- 開幕前の目隠し：OPEN_AT まで記録カード以降を隠してカウントダウン ---- */
   function curtainOn(){
     if (/[?&]curtain=1/.test(location.search)) return true;
@@ -1881,6 +2019,7 @@
   }
   function openCeremony(from){
     unlockAudio();
+    if (cer.hidden) ovPush("ceremony");
     cer.hidden = false; document.body.classList.add("lock");
     cer.classList.remove("in"); void cer.offsetWidth; cer.classList.add("in");
     rotY = 0; vel = 0; setRot();
@@ -1893,8 +2032,10 @@
     setTimeout(fanfare, 450); buzz([30, 60, 30, 60, 80]);
     track("ceremony_open", { from: from });
   }
-  function closeCeremony(){
+  function closeCeremony(fromPop){
+    if (cer.hidden) return;
     cer.hidden = true; document.body.classList.remove("lock");
+    if (fromPop !== true) ovPop("ceremony");
     if (confettiStop) { confettiStop(); confettiStop = null; }
     renderFinal();
     setTimeout(function(){ finalEl.scrollIntoView({ behavior:"smooth", block:"start" }); }, 60);
@@ -2156,7 +2297,7 @@
   function relayCardHtml(){
     var koala = '<img src="' + ART.koala + '" alt="">';
     if (!state.relayDone) {
-      return '<div class="relay-box"><p>12名の選手がバトンをつなぐリレーに出走！ ゴールして、リレーオーダー表を完成させよう！</p>' +
+      return '<div class="relay-box"><p><span class="nw">12名の選手がバトンをつなぐ</span><span class="nw">リレーに出走！</span> <span class="nw">ゴールして、</span><span class="nw">リレーオーダー表を</span><span class="nw">完成させよう！</span></p>' +
              '<button type="button" class="relay-open" data-relay="1">' + koala + 'リレーに出走する</button></div>';
     }
     return '<div class="relay-box"><p class="relay-ttl">🏃 リレーオーダー表</p>' + orderHtml() +
@@ -2187,8 +2328,19 @@
     }).join("") + "</ol>";
   }
 
+  /* ---- 全画面の画面（リレー・電卓・表彰式）は、スマホの「戻る」で閉じられるようにする ---- */
+  var ovIgnorePop = 0;
+  function ovPush(name){ try { history.pushState({ ov:name }, ""); } catch(e){} }
+  function ovPop(name){ try { if (history.state && history.state.ov === name) { ovIgnorePop++; history.back(); } } catch(e){} }
+  window.addEventListener("popstate", function(){
+    if (ovIgnorePop > 0) { ovIgnorePop--; return; }
+    if (!relayEl.hidden) closeRelay(true);
+    else if (!calcEl.hidden) closeCalc(true);
+    else if (!cer.hidden) closeCeremony(true);
+  });
   function openRelay(lv){
     unlockAudio();
+    if (relayEl.hidden) ovPush("relay");
     // 1回目（まだ完走していない）は「やさしい」。もう一度走るときは選んだ強さ
     var level = state.relayDone && lv ? rivalLevel(lv) : RIVAL_LEVELS[0];
     if (state.relayDone && lv) { state.relayLv = level.id; saveState(); }
@@ -2228,7 +2380,12 @@
     track("relay_open", { level: level.id });
   }
   function stopRelay(){ BGM.stop(0.1); if (!rl) return; if (rl.raf) cancelAnimationFrame(rl.raf); rl.timers.forEach(clearTimeout); rl = null; }
-  function closeRelay(){ stopRelay(); relayEl.hidden = true; document.body.classList.remove("lock"); zoomLock(false); }
+  function closeRelay(fromPop){
+    stopRelay(); relayEl.hidden = true; document.body.classList.remove("lock"); zoomLock(false);
+    var ev = EVENTS.filter(function(x){ return x.relay; })[0];
+    if (ev && document.getElementById("ev-" + ev.id)) renderCard(ev);   // ゴール後に×で閉じても、記録カードにオーダー表を出す
+    if (fromPop !== true) ovPop("relay");
+  }
   // リレー中は画面の拡大を止める（iPhoneで連打すると拡大されたままになるのを防ぐ）。閉じたら元に戻す
   var VP = document.querySelector('meta[name="viewport"]'), VP0 = VP ? VP.getAttribute("content") : "";
   function zoomLock(on){
@@ -2344,8 +2501,12 @@
     layoutZone();
   }
 
+  var mqLand = window.matchMedia ? window.matchMedia("(orientation:landscape) and (max-height:520px)") : null;
   function relayLoop(now){
     if (!rl) return;
+    if (mqLand && mqLand.matches && rl.started && !rl.finished) {   // 横向きの間は一時停止
+      rl.last = now; rl.raf = requestAnimationFrame(relayLoop); return;
+    }
     var dt = Math.min(0.05, (now - (rl.last || now)) / 1000); rl.last = now;
     var sdt = dt * rl.slow, c = rl.cur, n = rl.nxt;
     if (rl.started && !rl.finished) {
@@ -2752,8 +2913,8 @@
     r.textContent = res === undefined ? (calcExp ? calcExp.split(/[+−×÷()]/).pop() || "0" : "0") : res;
     document.getElementById("calcUse").disabled = calcVal === null;
   }
-  function openCalc(id){ calcFor = id; calcEl.hidden = false; document.body.classList.add("lock"); calcShow(calcVal === null ? undefined : calcVal); track("calc_open", { step_no:id }); }
-  function closeCalc(){ calcEl.hidden = true; document.body.classList.remove("lock"); }
+  function openCalc(id){ if (calcEl.hidden) ovPush("calc"); calcFor = id; calcEl.hidden = false; document.body.classList.add("lock"); calcShow(calcVal === null ? undefined : calcVal); track("calc_open", { step_no:id }); }
+  function closeCalc(fromPop){ if (calcEl.hidden) return; calcEl.hidden = true; document.body.classList.remove("lock"); if (fromPop !== true) ovPop("calc"); }
   calcEl.addEventListener("click", function(e){
     if (e.target === calcEl) return closeCalc();
     var b = e.target.closest && e.target.closest("[data-k]"); if (!b) return;
@@ -2847,7 +3008,7 @@
         return;
       }
       finalTries++;
-      track("final_wrong", { tries: finalTries });
+      track("final_wrong", { tries: finalTries, answer: ansText(fi.value) });
       wrong(fi, ffb, finalTries); fi.select();
       return;
     }
@@ -2873,7 +3034,7 @@
         var hit = inputs.map(function(i, k){ return matches(g[0], vals[k]) || matches(g[1], vals[k]); });
         inputs.forEach(function(i, k){ i.classList.toggle("ok", hit[k]); });
         tries[id] = (tries[id] || 0) + 1;
-        track("answer_wrong", { step: ev.word, step_no: id, tries: tries[id] });
+        track("answer_wrong", { step: ev.word, step_no: id, tries: tries[id], answer: ansText(vals.join(" / ")) });
         var bad = inputs.filter(function(i, k){ return !hit[k]; })[0] || inputs[1];
         var half = hit.filter(Boolean).length === 1 ? "1つは正解！ もう1つを考えてみよう。" :
                    (hit[0] && hit[1] ? "2つとも同じものを答えていないかな？" : "");
@@ -2915,7 +3076,7 @@
       return;
     }
     tries[id] = (tries[id] || 0) + 1;
-    track("answer_wrong", { step: ev.word, step_no: id, tries: tries[id] });
+    track("answer_wrong", { step: ev.word, step_no: id, tries: tries[id], answer: ansText(vals[0]) });
     wrong(inputs[0], fb, tries[id]); inputs[0].select();
   });
 
@@ -2942,6 +3103,8 @@
   renderToday();
   renderAll();
   initCurtain();
+  initParade();
+  checkPrivate();
   if (isLocked()) {   // ページを開いたまま9:00を迎えたら自動で入力欄を表示
     var wait = Date.parse(OPEN_AT) - Date.now() + 500;
     if (wait < 86400000) setTimeout(function(){ renderAll(); toast("スタート！ 答えを入力できるようになりました。"); }, wait);
