@@ -1248,7 +1248,7 @@
         body:"地上100mの展望室からは、名古屋の街を一望できるよ。カンガルーの世界記録の約10倍の高さ！" } },
     { id:3, no:"03", word:"RUN", kana:"はしる", color:"green",
       text:"1位になったのはだれ？",
-      answers:["バイソン"], img:"", stampImg:"",
+      answers:["バイソン","アメリカバイソン"], img:"", stampImg:"",
       fact:{ emoji:"🦬", img:"bison", title:"アメリカバイソンの身体能力のひみつ！",
         body:["アメリカバイソンは、体重が1トン近くにもなる巨体なのに、最高時速約55kmで走ることができるんだ！",
               "しかも、約1.5mの高さの障害物を跳び越えることもできる、驚きの運動能力の持ち主！"],
@@ -1569,7 +1569,7 @@
       setTimeout(function(){
         tip.classList.add("out");
         setTimeout(function(){ tip.remove(); el._tip = null; el.classList.remove("tapped"); an.play(); }, 220);
-      }, 3000);
+      }, 2300);   // 表示 約2.5秒（消えるアニメ0.2秒を含む）
     }
     function later2(ms){ setTimeout(run, ms || rnd(6000, 14000)); }
     later2(rnd(3000, 5000));
