@@ -383,6 +383,8 @@
   .story .ann > span:first-child{ flex:none; font-size:1.15rem; line-height:1.3; animation:annShake 1.4s ease-in-out infinite; transform-origin:30% 70%; }
   @keyframes annShake{ 0%, 70%, 100%{ transform:none; } 76%{ transform:rotate(-14deg) scale(1.12); } 84%{ transform:rotate(10deg) scale(1.12); } 92%{ transform:rotate(-6deg); } }
   .story .q{ margin:6px 0 0; padding-top:12px; border-top:2px dashed rgba(31,27,22,.25); }
+  .story .q-pre{ margin:6px 0 0; padding-top:12px; border-top:2px dashed rgba(31,27,22,.25); }
+  .story .q-pre + .q{ margin-top:0; padding-top:0; border-top:0; }
 
   /* ---------- info ---------- */
   .info{ display:flex; flex-direction:column; gap:14px; }
@@ -1382,6 +1384,7 @@
       "……と思ったら、たいへん！|表彰式の準備が|まだできていないぞ！",
       "📢 大会本部より、|お知らせいたします。\nまもなく、|表彰式を開始いたします。",   // \n＝必ず改行
       "急がないと！|このあとの表彰式に|間に合うように、|みんなの力で|表彰台をつくろう！",
+      "今までの答えを思い出して！\n折って、|折って、|折って、|折って、|表彰台！",   // 問題の直前に出す（点線の下）
       "完成した表彰台で、|1位になったのはだれ？"
     ],
     img:"",                 // 最終問題の画像（任意）
@@ -1869,7 +1872,7 @@
     return '<div class="story">' + t.map(function(line, i){
       line = String(line);
       if (/^📢/.test(line)) return '<p class="ann"><span aria-hidden="true">📢</span><span>' + phr(line.replace(/^📢\s*/, "")) + "</span></p>";
-      return '<p class="' + (i === last ? "q" : "st") + '">' + phr(line) + "</p>";
+      return '<p class="' + (i === last ? "q" : i === last - 1 ? "st q-pre" : "st") + '">' + phr(line) + "</p>";
     }).join("") + "</div>";
   }
   function renderFinal(opts){
