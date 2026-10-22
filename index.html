@@ -1255,7 +1255,7 @@
   var CERT_NICK_MAX = 12;
   // 開始前ロック：true にすると OPEN_AT（日本時間）まで「開幕まで…」の枠より下（記録カード以降）を隠し、カウントダウンを表示する
   // URL末尾に ?unlock=1 を付けるとロック中でもテストできる／?curtain=1 でロック前でも隠した状態を確認できる
-  var LOCK_BEFORE_OPEN = false;   // ★ 最後に true にする
+  var LOCK_BEFORE_OPEN = true;   // ★ 最後に true にする
   var OPEN_AT = "2026-11-01T09:00:00+09:00";   // 開幕日時（日本時間）
 
   var ABOUT = [
@@ -1308,7 +1308,7 @@
         note:["※人間の男子砲丸投げの世界記録は23.56m（砲丸の重さ7.26kg）！",
               "※人間の握力は、専用握力計（GM150）で177.9kgという記録があるよ！"] } },
     { id:2, no:"02", word:"JUMP", kana:"とぶ", color:"yellow",
-      text:"導き出された答えは？", placeholder:"数字で入力", inputmode:"numeric", calc:true,
+      text:"数式の答えは？", placeholder:"数字で入力", inputmode:"numeric", calc:true,
       answers:["134","134m","134メートル"], img:"", stampImg:"",
       fact:{ emoji:"🦘", img:"kangaroo", title:"カンガルーのジャンプのひみつ！",
         body:["カンガルーは、後ろ足の腱（けん）がバネのように働き、着地したときのエネルギーを次のジャンプに再利用できるんだ！",
